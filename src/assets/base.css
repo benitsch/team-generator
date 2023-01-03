@@ -59,6 +59,10 @@
   font-weight: normal;
 }
 
+html {
+  overflow: auto;
+}
+
 body {
   min-height: 100vh;
   color: var(--color-text);
