@@ -118,6 +118,8 @@ function resetPlayerDetail() {
   playerDetailDialog.value = false;
 }
 
+// FIXME when you open an existing player and close the pop up via ESC button -> click on new player via + button, you'll see the details of the existing player (same for games)
+
 function showPlayerDetail(player: Player) {
   playerDetail.value = player;
   playerDetailDialog.value = true;

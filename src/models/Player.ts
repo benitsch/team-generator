@@ -42,7 +42,7 @@ export default class Player {
     this._lastName = value;
   }
 
-  getFullName() {
+  getFullName():string {
     return this._firstName + " " + this._lastName;
   }
 }

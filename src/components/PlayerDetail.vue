@@ -69,11 +69,11 @@ import { useMainStore } from "@/stores/main";
 
 const state = useMainStore();
 
-const emit = defineEmits(["savePlayer", "cancelPlayer", "deletePlayer"]);
+const emit = defineEmits(["savePlayer", "cancelPlayer", "deletePlayer", "cancelDialog"]);
 const props = defineProps({
   playerDetail: {
     type: Player,
-    default: null
+    // default: null
   }
 });
 
