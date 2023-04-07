@@ -13,14 +13,16 @@
         </v-card-title>
         <v-card-subtitle>Manage existing players or add new ones.</v-card-subtitle>
         <v-card-text>
-          <v-text-field v-show="state.players.length > 3" class="mx-3" density="comfortable" label="Search" single-line prepend-inner-icon="mdi-magnify" hide-details v-model="playerSearch" clearable @click:clear="clearPlayerSearch"></v-text-field>
+          <v-text-field v-show="state.players.length > 3" class="mx-3" density="comfortable" label="Search" single-line
+                        prepend-inner-icon="mdi-magnify" hide-details v-model="playerSearch" clearable
+                        @click:clear="clearPlayerSearch"></v-text-field>
           <v-list class="list">
             <v-list-item
-              v-for="(item, i) in filteredPlayers"
-              :key="i"
-              :value="item"
-              prepend-icon="mdi-account-circle-outline"
-              @click="showPlayerDetail(item)"
+                v-for="(item, i) in filteredPlayers"
+                :key="i"
+                :value="item"
+                prepend-icon="mdi-account-circle-outline"
+                @click="showPlayerDetail(item)"
             >
               <v-list-item-title>{{ item.tag }}</v-list-item-title>
               <v-list-item-subtitle>{{ item.getFullName() }}</v-list-item-subtitle>
@@ -38,14 +40,16 @@
         </v-card-title>
         <v-card-subtitle>Manage existing games or add new ones.</v-card-subtitle>
         <v-card-text>
-          <v-text-field v-show="state.games.length > 3" class="mx-3" density="comfortable" label="Search" single-line prepend-inner-icon="mdi-magnify" hide-details v-model="gameSearch" clearable @click:clear="clearGameSearch"></v-text-field>
+          <v-text-field v-show="state.games.length > 3" class="mx-3" density="comfortable" label="Search" single-line
+                        prepend-inner-icon="mdi-magnify" hide-details v-model="gameSearch" clearable
+                        @click:clear="clearGameSearch"></v-text-field>
           <v-list class="list">
             <v-list-item
-              v-for="(item, i) in filteredGames"
-              :key="i"
-              :value="item"
-              prepend-icon="mdi-controller"
-              @click="showGameDetail(item)"
+                v-for="(item, i) in filteredGames"
+                :key="i"
+                :value="item"
+                prepend-icon="mdi-controller"
+                @click="showGameDetail(item)"
             >
               <v-list-item-title>{{ item.name }}</v-list-item-title>
               <v-list-item-subtitle>{{ item.genre }}</v-list-item-subtitle>
@@ -57,18 +61,18 @@
   </v-row>
   <v-dialog v-model="playerDetailDialog" :scrollable="true" @keydown.esc="cancelPlayerDetail">
     <PlayerDetail
-      :playerDetail="playerDetail"
-      @cancel-dialog="cancelPlayerDetail"
-      @save-player="savePlayerDetail"
-      @delete-player="deletePlayerDetail"
+        :playerDetail="playerDetail"
+        @cancel-dialog="cancelPlayerDetail"
+        @save-player="savePlayerDetail"
+        @delete-player="deletePlayerDetail"
     ></PlayerDetail>
   </v-dialog>
   <v-dialog v-model="gameDetailDialog">
     <GameDetail
-      :gameDetail="gameDetail"
-      @cancel-dialog="cancelGameDetail"
-      @save-game="saveGameDetail"
-      @delete-game="deleteGameDetail"
+        :gameDetail="gameDetail"
+        @cancel-dialog="cancelGameDetail"
+        @save-game="saveGameDetail"
+        @delete-game="deleteGameDetail"
     ></GameDetail>
   </v-dialog>
 </template>
@@ -79,7 +83,7 @@ import GameDetail from "@/components/GameDetail.vue";
 import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 import {computed, ref} from "vue";
-import { useMainStore } from "@/stores/main";
+import {useMainStore} from "@/stores/main";
 
 const state = useMainStore();
 
@@ -101,7 +105,7 @@ function clearPlayerSearch() {
 
 const filteredGames = computed(() => {
   return state.games.filter(item => {
-    if(!gameSearch.value) return state.games;
+    if (!gameSearch.value) return state.games;
     return (item.name.toLowerCase().includes(gameSearch.value.toLowerCase()) ||
         item.genre.toLowerCase().includes(gameSearch.value.toLowerCase()));
   });
@@ -109,7 +113,7 @@ const filteredGames = computed(() => {
 
 const filteredPlayers = computed(() => {
   return state.players.filter(item => {
-    if(!playerSearch.value) return state.players;
+    if (!playerSearch.value) return state.players;
     return (item.tag.toLowerCase().includes(playerSearch.value.toLowerCase()) ||
         item.firstName.toLowerCase().includes(playerSearch.value.toLowerCase()) ||
         item.lastName.toLowerCase().includes(playerSearch.value.toLowerCase()));
@@ -189,7 +193,7 @@ function showGameDetail(game: Game) {
 </script>
 
 <style scoped>
-  .list {
-    max-height: 300px;
-  }
+.list {
+  max-height: 300px;
+}
 </style>

@@ -14,12 +14,12 @@
 
 <script lang="ts">
 export default {
-	name: 'TheHeader',
-	data() {
-		return {
-			routes: this.$router.options.routes
-		}
-	},
+  name: 'TheHeader',
+  data() {
+    return {
+      routes: this.$router.options.routes
+    }
+  },
 }
 </script>
 

@@ -55,7 +55,7 @@
           Cancel
         </v-btn>
         <v-btn elevation="2" color="green darken-1" text @click="submit">
-          {{isEdit ? 'Edit' : 'Add'}}
+          {{ isEdit ? 'Edit' : 'Add' }}
         </v-btn>
       </v-card-actions>
     </v-card>

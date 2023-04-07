@@ -9,30 +9,30 @@
       </v-card-title>
       <v-card-text>
         <v-text-field
-          v-model="game.name"
-          label="Game name"
-          variant="outlined"
-          :rules="[rules.required]"
+            v-model="game.name"
+            label="Game name"
+            variant="outlined"
+            :rules="[rules.required]"
         ></v-text-field>
         <v-text-field
-          v-model="game.genre"
-          label="Game genre"
-          variant="outlined"
-          :rules="[rules.required]"
+            v-model="game.genre"
+            label="Game genre"
+            variant="outlined"
+            :rules="[rules.required]"
         ></v-text-field>
       </v-card-text>
 
       <v-card-actions class="justify-end">
         <v-btn
-          elevation="2"
-          color="red darken-1"
-          text
-          @click="emit('cancelDialog')"
+            elevation="2"
+            color="red darken-1"
+            text
+            @click="emit('cancelDialog')"
         >
           Cancel
         </v-btn>
         <v-btn elevation="2" color="green darken-1" text @click="submit">
-          {{isEdit ? 'Edit' : 'Add'}}
+          {{ isEdit ? 'Edit' : 'Add' }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -40,11 +40,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import {ref, computed} from "vue";
 import Game from "@/models/Game";
-import { useMainStore } from "@/stores/main";
+// import { useMainStore } from "@/stores/main";
 
-const state = useMainStore();
+// const state = useMainStore();
 
 const emit = defineEmits(["saveGame", "cancelGame", "deleteGame", "cancelDialog"]);
 const props = defineProps({

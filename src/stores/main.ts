@@ -3,7 +3,6 @@ import Player from "@/models/Player";
 import Game from "@/models/Game";
 import JsonObject from "@/models/JsonObject";
 import GameSkill from "@/models/GameSkill";
-import {pl} from "vuetify/locale";
 
 export const useMainStore = defineStore({
     id: "main",
@@ -30,13 +29,13 @@ export const useMainStore = defineStore({
         setStateFromJson(content: string) {
             const data = JSON.parse(content);
 
-            const players = data._players.map((playerData:any) => {
+            const players = data._players.map((playerData: any) => {
                 const player = new Player();
                 player.id = playerData._id;
                 player.tag = playerData._tag;
                 player.firstName = playerData._firstName;
                 player.lastName = playerData._lastName;
-                player.gameSkills = playerData._gameSkills.map((skillData:any) => {
+                player.gameSkills = playerData._gameSkills.map((skillData: any) => {
                     const gameSkill = new GameSkill();
                     gameSkill.id = skillData._id;
                     gameSkill.game = new Game();
@@ -49,7 +48,7 @@ export const useMainStore = defineStore({
                 return player;
             });
 
-            const games = data._games.map((gameData:any) => {
+            const games = data._games.map((gameData: any) => {
                 const game = new Game();
                 game.id = gameData._id;
                 game.name = gameData._name;
