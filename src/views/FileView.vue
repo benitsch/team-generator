@@ -10,10 +10,10 @@
         <v-card-subtitle>Sub Title</v-card-subtitle>
         <v-card-text>This ist the text</v-card-text>
         <v-card-actions class="justify-end">
-          <!-- TODO implement drag n drop file upload component (or v-file-input component) -->
-          <v-btn elevation="2" prepend-icon="mdi-cloud-upload">
-            Upload JSON File
-          </v-btn>
+          <v-file-input
+              v-model="uploadedFile"
+              accept="application/JSON"
+              label="Drop or select a file" @change="uploadJson" ref="fileInput"></v-file-input>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -22,11 +22,10 @@
         <v-card-title>Download as JSON file</v-card-title>
         <v-card-subtitle>Sub Title</v-card-subtitle>
         <v-card-text>
-          <!-- TODO add json code here with max height e.g. 150px and it should be a computed on player, games, etc. To have a preview of the json content -->
-          <code class="pa-3 rounded-sm">This ist the text CODE</code>
+          <code class="pa-3 rounded-sm jsonCode" v-text="jsonContent"></code>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn elevation="2" prepend-icon="mdi-cloud-download">
+          <v-btn elevation="2" prepend-icon="mdi-cloud-download" @click="downloadJson">
             Download JSON File
           </v-btn>
         </v-card-actions>
@@ -35,25 +34,75 @@
   </v-row>
 </template>
 
-<script lang="ts">
-export default {
+<script setup lang="ts">
+import {useMainStore} from "@/stores/main";
+import {computed, ref} from "vue";
 
-  props: {
-    // name: String,
-    // id: [Number, String],
-    // msg: { type: String, required: true },
-    // metadata: null
-  },
-  data() {
-    return {
-      jsonContent: null
-    };
-  },
-};
+const state = useMainStore();
+
+const jsonContent = computed(() => {
+  return state.getJson;
+});
+
+const uploadedFile = ref();
+
+/**
+ * Download all the data (players and games) as a json file (format see JsonObject.ts)
+ */
+function downloadJson() {
+  // Create a Blob file with the text content
+  const blob = new Blob([state.getJson], {type: "text/plain"});
+  // Create a download link
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  // Create a file name with the current date and time
+  const now = new Date();
+  link.download = `lancraft-${now.getFullYear()}${(now.getMonth() + 1).toString()
+      .padStart(2, "0")}${now.getDate().toString()
+      .padStart(2, "0")}-${now.getHours().toString()
+      .padStart(2, "0")}${now.getMinutes().toString()
+      .padStart(2, "0")}${now.getSeconds().toString()
+      .padStart(2, "0")}.json`;
+  // Add the link to the DOM and click it
+  document.body.appendChild(link);
+  link.click();
+  // Remove the link
+  document.body.removeChild(link);
+}
+
+/**
+ * The content of the uploaded json file is set to the Pinia status data to have all players and games.
+ */
+function uploadJson() {
+  const file = uploadedFile.value[0] as File;
+  if (!file) return;
+
+  if (!file.name.endsWith('.json')) {
+    uploadedFile.value = null;
+    alert('Invalid file format. Only .json files are allowed.');
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      state.setStateFromJson(reader.result as string);
+    } catch (error) {
+      uploadedFile.value = null;
+      alert('Invalid JSON file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
 </script>
 
 <style scoped>
 code {
   background-color: #e5e5e5;
+  display: block;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 </style>

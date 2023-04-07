@@ -3,6 +3,6 @@
   <p>You can generate new team line-ups for tournaments.</p>
 </template>
 
-<script lang="ts"></script>
+<script setup lang="ts"></script>
 
 <style scoped></style>

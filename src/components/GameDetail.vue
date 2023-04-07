@@ -4,7 +4,7 @@
       <v-card-title class="d-flex">
         {{ title }}
         <v-spacer></v-spacer>
-        <v-btn v-if="isEdit" color="red" variant="outlined" size="small" icon="mdi-delete"
+        <v-btn v-if="isEdit" color="red" variant="outlined" size="small" icon="mdi-delete" title="Delete Game"
                @click="emit('deleteGame')"></v-btn>
       </v-card-title>
       <v-card-text>
@@ -32,7 +32,7 @@
           Cancel
         </v-btn>
         <v-btn elevation="2" color="green darken-1" text @click="submit">
-          Add
+          {{isEdit ? 'Edit' : 'Add'}}
         </v-btn>
       </v-card-actions>
     </v-card>

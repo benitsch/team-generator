@@ -9,6 +9,10 @@ export default class Game {
     this._id = uuidv4();
   }
 
+  get game(): Game {
+    return this;
+  }
+
   get id(): string {
     return this._id;
   }

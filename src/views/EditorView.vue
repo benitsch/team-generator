@@ -15,16 +15,14 @@
         <v-card-text>
           <v-list>
             <v-list-item
-              v-for="(item, i) in state.player"
+              v-for="(item, i) in state.players"
               :key="i"
               :value="item"
               prepend-icon="mdi-account-circle-outline"
               @click="showPlayerDetail(item)"
             >
-              <v-list-item-content>
-                <v-list-item-title>{{ item.tag }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.getFullName() }}</v-list-item-subtitle>
-              </v-list-item-content>
+              <v-list-item-title>{{ item.tag }}</v-list-item-title>
+              <v-list-item-subtitle>{{ item.getFullName() }}</v-list-item-subtitle>
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -39,7 +37,7 @@
         </v-card-title>
         <v-card-subtitle>Manage existing games or add new ones.</v-card-subtitle>
         <v-card-text>
-          <v-list>
+          <v-list max-height="300px">
             <v-list-item
               v-for="(item, i) in state.games"
               :key="i"
@@ -47,18 +45,15 @@
               prepend-icon="mdi-controller"
               @click="showGameDetail(item)"
             >
-              <v-list-item-content>
-                <v-list-item-title>{{ item.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.genre }}</v-list-item-subtitle>
-              </v-list-item-content>
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ item.genre }}</v-list-item-subtitle>
             </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>
     </v-col>
   </v-row>
-  <!-- FIXME scrollable is not available/fixed in vuetify 3 beta at the moment -->
-  <v-dialog v-model="playerDetailDialog" :scrollable="true">
+  <v-dialog v-model="playerDetailDialog" :scrollable="true" @keydown.esc="cancelPlayerDetail">
     <PlayerDetail
       :playerDetail="playerDetail"
       @cancel-dialog="cancelPlayerDetail"
@@ -92,9 +87,9 @@ const gameDetailDialog = ref<boolean>(false);
 const gameDetail = ref<Game | null>();
 
 function savePlayerDetail(newPlayer: Player) {
-  const existingPlayerIdx = state.player.findIndex(player => player.id === playerDetail?.value?.id);
+  const existingPlayerIdx = state.players.findIndex(player => player.id === playerDetail?.value?.id);
   if (existingPlayerIdx !== -1) {
-    state.player[existingPlayerIdx] = newPlayer;
+    state.players[existingPlayerIdx] = newPlayer;
   } else {
     state.addPlayer(newPlayer);
   }
@@ -102,13 +97,14 @@ function savePlayerDetail(newPlayer: Player) {
 }
 
 function deletePlayerDetail() {
-  const existingPlayerIdx = state.player.findIndex(player => player.id === playerDetail?.value?.id);
+  const existingPlayerIdx = state.players.findIndex(player => player.id === playerDetail?.value?.id);
   if (existingPlayerIdx !== -1) {
-    state.player.splice(existingPlayerIdx, 1)
+    state.players.splice(existingPlayerIdx, 1)
   }
   resetPlayerDetail();
 }
 
+// FIXME when i change the gameskill of an existing player, it will save the value even if you press "Cancel" in the dialog.
 function cancelPlayerDetail() {
   resetPlayerDetail();
 }
@@ -119,6 +115,8 @@ function resetPlayerDetail() {
 }
 
 // FIXME when you open an existing player and close the pop up via ESC button -> click on new player via + button, you'll see the details of the existing player (same for games)
+// FIXME when you just click esc, it will not trigger the resetGameDetail function, but when you click within the dialog and then press esc, it will work ....
+// FIXME maybe listen on parent on esc press as well and check if playerDetailDialog is true (if dialog is open) ...
 
 function showPlayerDetail(player: Player) {
   playerDetail.value = player;

@@ -2,15 +2,16 @@ import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 
 export default class JsonObject {
-  private _player = [] as Player[];
-  private _games = [] as Game[];
+  // private _player = [] as Player[];
+  private _players : Player[] = [];
+  private _games : Game[] = [];
 
-  get player(): Player[] {
-    return this._player;
+  get players(): Player[] {
+    return this._players;
   }
 
-  set player(value: Player[]) {
-    this._player = value;
+  set players(value: Player[]) {
+    this._players = value;
   }
 
   get games(): Game[] {
