@@ -13,9 +13,10 @@
         </v-card-title>
         <v-card-subtitle>Manage existing players or add new ones.</v-card-subtitle>
         <v-card-text>
-          <v-list>
+          <v-text-field v-show="state.players.length > 3" class="mx-3" density="comfortable" label="Search" single-line prepend-inner-icon="mdi-magnify" hide-details v-model="playerSearch" clearable @click:clear="clearPlayerSearch"></v-text-field>
+          <v-list class="list">
             <v-list-item
-              v-for="(item, i) in state.players"
+              v-for="(item, i) in filteredPlayers"
               :key="i"
               :value="item"
               prepend-icon="mdi-account-circle-outline"
@@ -37,9 +38,10 @@
         </v-card-title>
         <v-card-subtitle>Manage existing games or add new ones.</v-card-subtitle>
         <v-card-text>
-          <v-list max-height="300px">
+          <v-text-field v-show="state.games.length > 3" class="mx-3" density="comfortable" label="Search" single-line prepend-inner-icon="mdi-magnify" hide-details v-model="gameSearch" clearable @click:clear="clearGameSearch"></v-text-field>
+          <v-list class="list">
             <v-list-item
-              v-for="(item, i) in state.games"
+              v-for="(item, i) in filteredGames"
               :key="i"
               :value="item"
               prepend-icon="mdi-controller"
@@ -76,7 +78,7 @@ import PlayerDetail from "@/components/PlayerDetail.vue";
 import GameDetail from "@/components/GameDetail.vue";
 import type Player from "@/models/Player";
 import type Game from "@/models/Game";
-import { ref } from "vue";
+import {computed, ref} from "vue";
 import { useMainStore } from "@/stores/main";
 
 const state = useMainStore();
@@ -85,6 +87,34 @@ const playerDetailDialog = ref<boolean>(false);
 const playerDetail = ref<Player | null>();
 const gameDetailDialog = ref<boolean>(false);
 const gameDetail = ref<Game | null>();
+
+const gameSearch = ref('');
+const playerSearch = ref('');
+
+function clearGameSearch() {
+  gameSearch.value = "";
+}
+
+function clearPlayerSearch() {
+  playerSearch.value = "";
+}
+
+const filteredGames = computed(() => {
+  return state.games.filter(item => {
+    if(!gameSearch.value) return state.games;
+    return (item.name.toLowerCase().includes(gameSearch.value.toLowerCase()) ||
+        item.genre.toLowerCase().includes(gameSearch.value.toLowerCase()));
+  });
+});
+
+const filteredPlayers = computed(() => {
+  return state.players.filter(item => {
+    if(!playerSearch.value) return state.players;
+    return (item.tag.toLowerCase().includes(playerSearch.value.toLowerCase()) ||
+        item.firstName.toLowerCase().includes(playerSearch.value.toLowerCase()) ||
+        item.lastName.toLowerCase().includes(playerSearch.value.toLowerCase()));
+  });
+});
 
 function savePlayerDetail(newPlayer: Player) {
   const existingPlayerIdx = state.players.findIndex(player => player.id === playerDetail?.value?.id);
@@ -158,4 +188,8 @@ function showGameDetail(game: Game) {
 // TODO Possible refactoring: Add new or edit is quite similar, now we just differ with a detail variable called e.g. playerDetail or gameDetail
 </script>
 
-<style scoped></style>
+<style scoped>
+  .list {
+    max-height: 300px;
+  }
+</style>

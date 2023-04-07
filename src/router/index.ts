@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import FileView from "../views/FileView.vue";
-import EditorView from "../views/EditorView.vue";
-import GeneratorView from "../views/GeneratorView.vue";
+import FileView from "@/views/FileView.vue";
+import EditorView from "@/views/EditorView.vue";
+import GeneratorView from "@/views/GeneratorView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
