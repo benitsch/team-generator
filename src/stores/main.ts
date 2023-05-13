@@ -16,7 +16,7 @@ export const useMainStore = defineStore({
             Object.assign(jsonObj.players, state.players);
             Object.assign(jsonObj.games, state.games);
 
-            return JSON.stringify(jsonObj);
+            return JSON.stringify(jsonObj, null, 2);
         }
     },
     actions: {
