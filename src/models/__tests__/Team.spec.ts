@@ -210,7 +210,7 @@ describe("Team properties tests.", () => {
 
   it("Shall consider a game skill unspecified only one player has no specified skill for the game.", () => {
     const team: Team = new Team("team-name", 3);
-    let player: Player = new Player("AWESOM-O", "Jon", "Doe");
+    const player: Player = new Player("AWESOM-O", "Jon", "Doe");
     team.addPlayer(player);
     expect(team.isSkillAssessedForGame).toBeFalsy;
  
@@ -218,9 +218,9 @@ describe("Team properties tests.", () => {
 
    it("Shall consider a game skill specified if all players have the game skill specified.", () => {
     const team: Team = new Team("team-name", 3);
-    let player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    const player1: Player = new Player("AWESOM-O", "Jon", "Doe");
     player1.addGameSkill(new GameSkill(game, 3));
-    let player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    const player2: Player = new Player("McAwesome", "Max", "Mustermann");
     player2.addGameSkill(new GameSkill(game, 5));
 
     team.addPlayer(player1);
@@ -231,9 +231,9 @@ describe("Team properties tests.", () => {
 
    it("Shall calculate the skill sum of the team properly.", () => {
     const team: Team = new Team("team-name", 3);
-    let player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    const player1: Player = new Player("AWESOM-O", "Jon", "Doe");
     player1.addGameSkill(new GameSkill(game, 3));
-    let player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    const player2: Player = new Player("McAwesome", "Max", "Mustermann");
     player2.addGameSkill(new GameSkill(game, 5));
 
     team.addPlayer(player1);
