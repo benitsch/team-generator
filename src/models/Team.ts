@@ -82,6 +82,19 @@ export default class Team {
         return true;
     }
 
+    getSkillForGame(game: Game): number | undefined {
+        let skill: number = 0;
+        for (let player of this.allPlayers){
+            let playerSkill = player.getSkillForGame(game);
+            if(playerSkill === undefined){
+                return undefined;
+            }else{
+                skill += playerSkill;
+            }
+        }
+        return skill;
+    }
+
 
     get fixedPlayers(): ReadonlyArray<Player> {
         return this._playerList;
