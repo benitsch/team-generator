@@ -85,15 +85,10 @@ export default class Team {
         return true;
     }
 
-    getSkillForGame(game: Game): number | undefined {
+    getSkillForGame(game: Game): number {
         let skill: number = 0;
         for (let player of this.allPlayers){
-            let playerSkill = player.getSkillForGame(game);
-            if(playerSkill === undefined){
-                return undefined;
-            }else{
-                skill += playerSkill;
-            }
+            skill += player.getSkillForGame(game);
         }
         return skill;
     }

@@ -85,13 +85,13 @@ export default class Player {
         return false;
     }
 
-    getSkillForGame(game: Game): number | undefined {
+    getSkillForGame(game: Game): number {
         for (let gameSkill of this._gameSkills){
             if(gameSkill.game === game){
                 return gameSkill.skillLevel;
             }
         }
-        return undefined;
+        return 0;
     }
 
     getFullName(): string {
