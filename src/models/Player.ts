@@ -9,9 +9,23 @@ export default class Player {
     private _gameSkills: GameSkill[] = [];
 
 
-    constructor() {
+    constructor(tag?: string, firstName?: string, lastName?: string) {
         this._id = uuidv4();
+
+        if (tag){
+            this._tag = tag;
+        }
+        
+        if (firstName){
+            this._firstName = firstName;
+        }
+
+        if (lastName){
+            this._lastName = lastName;
+        }
+
     }
+
 
     get id(): string {
         return this._id;
