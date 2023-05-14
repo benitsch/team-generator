@@ -3,9 +3,14 @@ import type Game from "@/models/Game";
 import type GameSkill from "@/models/GameSkill";
 import type Player from "@/models/Player";
 import type Team from "@/models/Team";
+import {ContainerUtils} from "@/models/Utils";
+
+export enum GeneratorErrorCode {
+    TeamSizeAndPlayerLengthMismatch = 1,
+    PlayerSkillsIncomplete,
+  }
+
 export default class TeamGenerator {
-
-
 
     /**
      * Generates a set of randomly assembled but balanced teams out of a set of given players and specified team size for a given game.
@@ -67,14 +72,35 @@ export default class TeamGenerator {
      * @param game The game on which the balancing will be based (all players must be assessed with a skill >= 0 for this game)
      * @returns A set of randomly assembled but balanced teams.
      */
-    static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> {
+    static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> | GeneratorErrorCode{
 
-        //Step 1: do proper param check (player length, teamSize and game skill != 0 for all player)
-            //--> at least 2 full teams need to be createable: player.length >= 2* teamSize
+        //Step 1: do proper param check
+            
+        //--> at least 2 full teams need to be createable: players.length >= 2* teamSize
+        if(players.length < 2 * teamSize){
+            return GeneratorErrorCode.TeamSizeAndPlayerLengthMismatch;
+        }
+        //--> each player must have a valid assessment for the given game
+        for (const player of players){
+            if(!player.isSkillAssessedForGame(game)){
+                return GeneratorErrorCode.PlayerSkillsIncomplete;
+            }
+        }
 
         //Step 2: order players by their skill ascending and shuffle players with same skill in array
+        let playerSkillMapping: Map<number, Array<Player>> = 
+            ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
+        playerSkillMapping = ContainerUtils.sortMapAscendingByKey<Array<Player>>(playerSkillMapping);
+
+        let orderedPlayerArray: Array<Player> = new Array<Player>();
+        for(const playerArray of playerSkillMapping.values()){
+            ContainerUtils.shuffleArray(playerArray);
+            orderedPlayerArray = orderedPlayerArray.concat(playerArray);
+        }
+
         
-        //Step 3: calculate the amount of teams creatable out of the player list and create them(player.length % teamSize may be > 0)
+        //Step 3: calculate the amount of teams creatable out of the player list and create them(players.length % teamSize may be > 0)
+        const amountOfTeams = orderedPlayerArray.length / teamSize + (orderedPlayerArray.length % teamSize > 0? 1 : 0);
 
         //Step 4: Alternate between forward and backward looping over teams and add one player at a time(from high to low skill)
 
