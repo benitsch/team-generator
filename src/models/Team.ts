@@ -74,6 +74,9 @@ export default class Team {
     }
 
     isSkillAssessedForGame(game: Game): boolean{
+        if(this.addPlayer.length === 0){
+            return false;
+        }
         for (let player of this.allPlayers){
             if(!player.isSkillAssessedForGame(game)){
                 return false;

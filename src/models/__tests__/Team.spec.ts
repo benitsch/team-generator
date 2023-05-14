@@ -2,6 +2,8 @@
 
  import Team from "../Team";
  import Player from "../Player";
+import GameSkill from "../GameSkill";
+import Game from "../Game";
 
  describe("Constructor Test", () => {
 
@@ -194,6 +196,52 @@
 
    });
 
+});
 
+describe("Team properties tests.", () => {
+
+  const game: Game = new Game("CSGO", "Shooter");
+
+  it("Shall consider a game skill unspecified if no player is in the team.", () => {
+   const team: Team = new Team("team-name", 3);
+   expect(team.isSkillAssessedForGame).toBeFalsy;
+
+  });
+
+  it("Shall consider a game skill unspecified only one player has no specified skill for the game.", () => {
+    const team: Team = new Team("team-name", 3);
+    let player: Player = new Player("AWESOM-O", "Jon", "Doe");
+    team.addPlayer(player);
+    expect(team.isSkillAssessedForGame).toBeFalsy;
+ 
+   });
+
+   it("Shall consider a game skill specified if all players have the game skill specified.", () => {
+    const team: Team = new Team("team-name", 3);
+    let player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    player1.addGameSkill(new GameSkill(game, 3));
+    let player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    player2.addGameSkill(new GameSkill(game, 5));
+
+    team.addPlayer(player1);
+    team.addPlayer(player2);
+    expect(team.isSkillAssessedForGame).toBeTruthy;
+ 
+   });
+
+   it("Shall calculate the skill sum of the team properly.", () => {
+    const team: Team = new Team("team-name", 3);
+    let player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    player1.addGameSkill(new GameSkill(game, 3));
+    let player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    player2.addGameSkill(new GameSkill(game, 5));
+
+    team.addPlayer(player1);
+    team.addPlayer(player2);
+    expect(team.getSkillForGame(game)).toBeDefined;
+    expect(team.getSkillForGame(game)).toEqual(8);
+ 
+   });
+ 
 
 });
