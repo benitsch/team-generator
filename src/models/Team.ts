@@ -77,7 +77,7 @@ export default class Team {
         if(this.addPlayer.length === 0){
             return false;
         }
-        for (let player of this.allPlayers){
+        for (const player of this.allPlayers){
             if(!player.isSkillAssessedForGame(game)){
                 return false;
             }
@@ -87,7 +87,7 @@ export default class Team {
 
     getSkillForGame(game: Game): number {
         let skill: number = 0;
-        for (let player of this.allPlayers){
+        for (const player of this.allPlayers){
             skill += player.getSkillForGame(game);
         }
         return skill;

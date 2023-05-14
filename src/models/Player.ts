@@ -74,7 +74,7 @@ export default class Player {
     }
 
     isSkillAssessedForGame(game: Game): boolean{
-        for (let gameSkill of this._gameSkills){
+        for (const gameSkill of this._gameSkills){
             if(gameSkill.game === game){
                 if (gameSkill.skillLevel > 0){
                     return true;
@@ -86,7 +86,7 @@ export default class Player {
     }
 
     getSkillForGame(game: Game): number {
-        for (let gameSkill of this._gameSkills){
+        for (const gameSkill of this._gameSkills){
             if(gameSkill.game === game){
                 return gameSkill.skillLevel;
             }
