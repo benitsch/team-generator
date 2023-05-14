@@ -8,11 +8,10 @@ export default class Team {
     private _playerList: Array<Player> = [];
     private _substitutionPlayerList: Array<Player> = [];
 
-    constructor(name: string, targetSize: number, playerList: Array<Player>) {
+    constructor(name: string, targetSize: number) {
         this._id = uuidv4();
         this._name = name;
         this._targetSize = targetSize;
-        this._playerList = playerList;
     }
 
     get id(): string {
