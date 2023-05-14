@@ -1,7 +1,7 @@
  import { describe, it, expect } from "vitest";
 
- import Team from "../../../models/Team";
- import Player from "../../../models/Player";
+ import Team from "../Team";
+ import Player from "../Player";
 
  describe("Constructor Test", () => {
 
