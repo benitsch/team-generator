@@ -1,5 +1,6 @@
 import {v4 as uuidv4} from "uuid";
 import type Player from "@/models/Player";
+import type Game from "@/models/Game";
 
 export default class Team {
     private _id = "";
@@ -72,12 +73,26 @@ export default class Team {
         return this._playerList.includes(player) || this._substitutionPlayerList.includes(player);
     }
 
-    get player(): ReadonlyArray<Player> {
+    isSkillAssessedForGame(game: Game): boolean{
+        for (let player of this.allPlayers){
+            if(!player.isSkillAssessedForGame(game)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    get fixedPlayers(): ReadonlyArray<Player> {
         return this._playerList;
     }
 
-    get substitutionPlayer(): ReadonlyArray<Player> {
+    get substitutionPlayers(): ReadonlyArray<Player> {
         return this._substitutionPlayerList;
+    }
+
+    get allPlayers(): ReadonlyArray<Player> {
+        return this.fixedPlayers.concat(this.substitutionPlayers);
     }
 
 }

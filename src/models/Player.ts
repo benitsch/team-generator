@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from "uuid";
+import type Game from "@/models/Game";
 import type GameSkill from "@/models/GameSkill";
 
 export default class Player {
@@ -70,6 +71,27 @@ export default class Player {
 
     addGameSkill(skill: GameSkill) {
         this._gameSkills.push(skill);
+    }
+
+    isSkillAssessedForGame(game: Game): boolean{
+        for (let gameSkill of this._gameSkills){
+            if(gameSkill.game === game){
+                if (gameSkill.skillLevel > 0){
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
+    getSkillForGame(game: Game): number | undefined {
+        for (let gameSkill of this._gameSkills){
+            if(gameSkill.game === game){
+                return gameSkill.skillLevel;
+            }
+        }
+        return undefined;
     }
 
     getFullName(): string {

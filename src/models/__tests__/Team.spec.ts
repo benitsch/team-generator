@@ -132,8 +132,8 @@
     expect(team.currentSize).toEqual(2);
     expect(team.isPlayerInTeam(player1)).toBeTruthy;
     expect(team.isPlayerInTeam(player2)).toBeTruthy;
-    expect(team.player).toContain(player1);
-    expect(team.substitutionPlayer).toContain(player2);
+    expect(team.fixedPlayers).toContain(player1);
+    expect(team.substitutionPlayers).toContain(player2);
 
    });
 
@@ -147,14 +147,14 @@
     expect(team.addPlayer(player1)).toBeTruthy;
     expect(team.addPlayer(player2)).toBeTruthy;
     expect(team.currentSize).toEqual(2);
-    expect(team.player).toContain(player1);
-    expect(team.player).toContain(player2);
+    expect(team.fixedPlayers).toContain(player1);
+    expect(team.fixedPlayers).toContain(player2);
     expect(team.isFull).toBeTruthy;
 
 
     const player3: Player = new Player("NotInvited", "The", "Devil");
     expect(team.addPlayer(player3)).toBeFalsy
-    expect(team.player).not.toContain(player3);
+    expect(team.fixedPlayers).not.toContain(player3);
 
    });
 
