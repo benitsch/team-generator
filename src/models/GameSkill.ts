@@ -3,27 +3,23 @@ import type Game from "@/models/Game";
 
 export default class GameSkill {
     private _id = "";
-    private _game: Game | undefined;
+    private readonly _game: Game;
     private _skillLevel = 0;
 
-    constructor() {
+    constructor(game: Game, skillLevel?: number) {
         this._id = uuidv4();
+        this._game = game;
+        if(skillLevel){
+            this._skillLevel = skillLevel;
+        }
     }
 
     get id(): string {
         return this._id;
     }
 
-    set id(value: string) {
-        this._id = value;
-    }
-
-    get game(): Game | undefined {
+    get game(): Game {
         return this._game;
-    }
-
-    set game(value: Game | undefined) {
-        this._game = value;
     }
 
     get skillLevel(): number {
