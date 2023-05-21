@@ -1,7 +1,7 @@
 
 import type Game from "@/models/Game";
-import type GameSkill from "@/models/GameSkill";
-import type Player from "@/models/Player";
+import GameSkill from "@/models/GameSkill";
+import Player from "@/models/Player";
 import Team from "@/models/Team";
 import {ContainerUtils} from "@/models/Utils";
 
@@ -118,24 +118,29 @@ export default class TeamGenerator {
         //Step 4: Alternate between forward and backward looping over teams and add one player at a time(from high to low skill)
         let teamIndex: number = 0;
         let forward: boolean = true;
+        let playerSkillSum: number = 0;
         for (const player of orderedPlayerArray){
 
-            if(forward){
+            playerSkillSum += player.getSkillForGame(game);
+
+            if(forward){ //alternating after each team has an additional player assigned
 
                 if (teamIndex < teamArray.length){
                     teamArray.at(teamIndex)?.addPlayer(player);
                     teamIndex++;
                 }else{
+                    // additional team gets last in forward iteration if limit allows
                     if (additionalTeam.currentSize < amountOfRemainingPlayers){
                         additionalTeam.addPlayer(player);
                     }
-                    forward = false;
+                    forward = false; // switch to bachwards now
                 }
                 
-            }else{ // backward  
+            }else{ // backwards
 
                 if(teamIndex >= teamArray.length){
                     teamIndex = teamArray.length - 1;
+                    // additional team gets first in backward iteration if limit allows
                     if(additionalTeam.currentSize < amountOfRemainingPlayers){
                         additionalTeam.addPlayer(player);
                     }
@@ -144,7 +149,7 @@ export default class TeamGenerator {
                     teamIndex--;
                 }else{
                     teamIndex = 0;
-                    forward = true;
+                    forward = true; // switch to forward again
                 }
             }
         }
@@ -153,7 +158,19 @@ export default class TeamGenerator {
 
         //Step 5: Refine team balance (swap players between best and worst team if possible)
 
-        //TODO(tg): add fake sub player to additional team with skill = max + min / 2 until additional team full. while balancing, only swap real players. when done remove sub players from additional team.
+        // fill up additional team with fake substitution player for refinement step, remove afterwards
+        if (additionalTeam.fixedPlayers.length > 0){
+            const avgPlayerSkill: number = Math.round(playerSkillSum / orderedPlayerArray.length);
+            for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
+                let player: Player = new Player("FakeSubPlayer" + 1);
+                player.addGameSkill(new GameSkill(game, avgPlayerSkill));
+            }
+        }
+
+
+
+        //TODO(tg): add fake sub player to additional team with skill = max + min / 2 until additional team full. while balancing, 
+        // only swap real players. when done remove sub players from additional team.
 
         return [];
     }
