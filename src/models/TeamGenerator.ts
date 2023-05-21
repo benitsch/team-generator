@@ -2,7 +2,7 @@
 import type Game from "@/models/Game";
 import type GameSkill from "@/models/GameSkill";
 import type Player from "@/models/Player";
-import type Team from "@/models/Team";
+import Team from "@/models/Team";
 import {ContainerUtils} from "@/models/Utils";
 
 export enum GeneratorErrorCode {
@@ -88,25 +88,72 @@ export default class TeamGenerator {
         }
 
         //Step 2: order players by their skill ascending and shuffle players with same skill in array
+        // group players with same skill
         let playerSkillMapping: Map<number, Array<Player>> = 
             ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
-        playerSkillMapping = ContainerUtils.sortMapAscendingByKey<Array<Player>>(playerSkillMapping);
 
+        // order groups ascending
+        let orderedPlayerGroupMap = ContainerUtils.sortMapAscendingByKey<Array<Player>>(playerSkillMapping);
+
+        // concatenate groups but shuffle within groups (same skill) beforehand to randomize a bit
         let orderedPlayerArray: Array<Player> = new Array<Player>();
-        for(const playerArray of playerSkillMapping.values()){
-            ContainerUtils.shuffleArray(playerArray);
-            orderedPlayerArray = orderedPlayerArray.concat(playerArray);
+        for(const playerOfSameSkillArray of orderedPlayerGroupMap.values()){
+            ContainerUtils.shuffleArray(playerOfSameSkillArray);
+            orderedPlayerArray = orderedPlayerArray.concat(playerOfSameSkillArray);
         }
 
         
         //Step 3: calculate the amount of teams creatable out of the player list and create them(players.length % teamSize may be > 0)
-        const amountOfTeams = orderedPlayerArray.length / teamSize + (orderedPlayerArray.length % teamSize > 0? 1 : 0);
+        // amount of teams that can be filled up with players
+        const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
+        let teamArray: Array<Team> = new Array<Team>();
+        for (let i = 1; i <= amountOfFullTeams; i++){
+            teamArray.push(new Team("Team" + i, teamSize));
+        }
+
+        const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
+        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize); // will not be used if no remaining players
+
 
         //Step 4: Alternate between forward and backward looping over teams and add one player at a time(from high to low skill)
+        let teamIndex: number = 0;
+        let forward: boolean = true;
+        for (const player of orderedPlayerArray){
+
+            if(forward){
+
+                if (teamIndex < teamArray.length){
+                    teamArray.at(teamIndex)?.addPlayer(player);
+                    teamIndex++;
+                }else{
+                    if (additionalTeam.currentSize < amountOfRemainingPlayers){
+                        additionalTeam.addPlayer(player);
+                    }
+                    forward = false;
+                }
+                
+            }else{ // backward  
+
+                if(teamIndex >= teamArray.length){
+                    teamIndex = teamArray.length - 1;
+                    if(additionalTeam.currentSize < amountOfRemainingPlayers){
+                        additionalTeam.addPlayer(player);
+                    }
+                }else if(teamIndex >= 0){
+                    teamArray.at(teamIndex)?.addPlayer(player);
+                    teamIndex--;
+                }else{
+                    teamIndex = 0;
+                    forward = true;
+                }
+            }
+        }
+
+
 
         //Step 5: Refine team balance (swap players between best and worst team if possible)
 
-        //Step 6: If any team not full (create possible substition player list ascending by fairness regarding balance)
+        //TODO(tg): add fake sub player to additional team with skill = max + min / 2 until additional team full. while balancing, only swap real players. when done remove sub players from additional team.
 
         return [];
     }
