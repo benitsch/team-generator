@@ -72,7 +72,7 @@ export default class TeamGenerator {
      * @param game The game on which the balancing will be based (all players must be assessed with a skill >= 0 for this game)
      * @returns A set of randomly assembled but balanced teams.
      */
-    static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> | GeneratorErrorCode{
+    public static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> | GeneratorErrorCode{
 
         //Step 1: do proper param check
             
@@ -172,7 +172,31 @@ export default class TeamGenerator {
         //TODO(tg): add fake sub player to additional team with skill = max + min / 2 until additional team full. while balancing, 
         // only swap real players. when done remove sub players from additional team.
 
+
+        //Step 6: add min + max team skill range to each team as reference for possible substitutions.
+
         return [];
+    }
+
+    protected static trySwapPlayerForBetterBalance(team1: Team, team2: Team, game: Game): boolean{
+
+        //Step 1: Calc skill diff for given game
+        let teamSkill1: number = team1.getSkillForGame(game);
+        let teamSkill2: number = team2.getSkillForGame(game);
+        let skillDiff: number = Math.abs(teamSkill1 - teamSkill2);
+
+        if (skillDiff <= 1) { // no better balance possible as only 1 skill point can be shifted at most
+            return false; 
+        }
+
+        //Step 2: check which team is better in given game
+
+
+        //Step 3: Fetch best possible swap pairs if any, which result lower diff
+
+        //Step 4: If any swap possibilities, pick one randomly and return true, if not return false
+
+        return true;
     }
 
 }
