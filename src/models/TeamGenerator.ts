@@ -178,6 +178,20 @@ export default class TeamGenerator {
         return [];
     }
 
+    /**
+     * This function is a protected subroutine call which takes 2 full teams and 1 game as input
+     * and tries to swap 1 player pair if applicable to decrease the skill diff of the given teams
+     * as much as possible. If several options with the same result are available then a random
+     * pair out of the options is chosen.
+     * 
+     * NOTE!: this function does no param check as it is only a subroutine and expects the given teams
+     * to be full and the game skill is given for all players for the passed game.
+     * 
+     * @param team1 The first team to be balanced.
+     * @param team2 The second team to be balanced with.
+     * @param game The game on which the skills between the teams will be compared for possible swaps.
+     * @returns true if one pair of players could be swapped to decrease the skill diff, false otherwise.
+     */
     protected static trySwapPlayerForBetterBalance(team1: Team, team2: Team, game: Game): boolean{
 
         //Step 1: Calc skill diff for given game
