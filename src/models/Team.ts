@@ -69,6 +69,14 @@ export default class Team {
         }
     }
 
+    clearFixedPlayers(): void {
+        this._playerList.splice(0);
+    }
+
+    clearSubstitutionPlayers(): void {
+        this._substitutionPlayerList.splice(0);
+    }
+
     isPlayerInTeam(player: Player): boolean {
         return this._playerList.includes(player) || this._substitutionPlayerList.includes(player);
     }
