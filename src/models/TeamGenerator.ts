@@ -158,24 +158,33 @@ export default class TeamGenerator {
 
         //Step 5: Refine team balance (swap players between best and worst team if possible)
 
-        // fill up additional team with fake substitution player for refinement step, remove afterwards
+        // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
         if (additionalTeam.fixedPlayers.length > 0){
             const avgPlayerSkill: number = Math.round(playerSkillSum / orderedPlayerArray.length);
             for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
-                let player: Player = new Player("FakeSubPlayer" + 1);
+                let player: Player = new Player("FakeSubPlayer" + i);
                 player.addGameSkill(new GameSkill(game, avgPlayerSkill));
             }
         }
 
+        teamArray.push(additionalTeam); // add team with sub players to collection for balance optimizations
 
+        // optimize team balance as long as successful but at most until all swap options are exhausted
+        const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getSkillForGame(game) - team2.getSkillForGame(game);};
+        let maxSwapsLeft: number = teamArray.length * teamArray.length * (teamSize - 1); // (team size - 1) swaps per team pair.
+        let lastSwapSuccessful:boolean = true;
 
-        //TODO(tg): add fake sub player to additional team with skill = max + min / 2 until additional team full. while balancing, 
-        // only swap real players. when done remove sub players from additional team.
+        while(lastSwapSuccessful && maxSwapsLeft > 0){
+            teamArray.sort(teamAscendingComparer);
+            // always try to swap one player between best and worst team:
+            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teamArray[0], teamArray[teamArray.length - 1], game);
+            maxSwapsLeft--;
+        }
 
+        // remove fake sub players again from additional team:
+        additionalTeam.clearSubstitutionPlayers();
 
-        //Step 6: add min + max team skill range to each team as reference for possible substitutions.
-
-        return [];
+        return teamArray;
     }
 
     /**
