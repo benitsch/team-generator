@@ -185,7 +185,8 @@ export default class TeamGenerator {
      * pair out of the options is chosen.
      * 
      * NOTE!: this function does no param check as it is only a subroutine and expects the given teams
-     * to be full and the game skill is given for all players for the passed game.
+     * to be full and the game skill is given for all players for the passed game and that each team
+     * has at least 1 fixed player. Swapping will only be done with fixed players, not substitution players.
      * 
      * @param team1 The first team to be balanced.
      * @param team2 The second team to be balanced with.
@@ -197,20 +198,57 @@ export default class TeamGenerator {
         //Step 1: Calc skill diff for given game
         let teamSkill1: number = team1.getSkillForGame(game);
         let teamSkill2: number = team2.getSkillForGame(game);
-        let skillDiff: number = Math.abs(teamSkill1 - teamSkill2);
+        let teamSkillDiff: number = Math.abs(teamSkill1 - teamSkill2);
 
-        if (skillDiff <= 1) { // no better balance possible as only 1 skill point can be shifted at most
+        if (teamSkillDiff <= 1) { // no better balance possible as only 1 skill point can be shifted at most
             return false; 
         }
 
         //Step 2: check which team is better in given game
+        let higherTeam: Team = teamSkill1 > teamSkill2? team1 : team2;
+        let lowerTeam: Team = teamSkill1 < teamSkill2? team1 : team2;
 
 
         //Step 3: Fetch best possible swap pairs if any, which result lower diff
+        let optimumSkillShift: number = teamSkillDiff/2;
+        let potentialSwapPairs: Array<[Player, Player]> = new Array<[Player, Player]>();
+
+        let bestDistanceToOptimum = optimumSkillShift; //full distance to optimum
+        for(const playerTeamHigh of higherTeam.fixedPlayers){
+            for(const playerTeamLow of lowerTeam.fixedPlayers){
+
+                let skillGainLowerTeam: number = playerTeamHigh.getSkillForGame(game) - playerTeamLow.getSkillForGame(game);
+
+                if (skillGainLowerTeam <= 0 || skillGainLowerTeam >= teamSkillDiff) { 
+                    continue;  // skip option if team skill difference would be increased
+                }
+
+                let distanceToOptimum: number = Math.abs(optimumSkillShift - skillGainLowerTeam);
+                if (distanceToOptimum > bestDistanceToOptimum){
+                    continue; // skip if there are already better options
+                }
+                if (distanceToOptimum < bestDistanceToOptimum){
+                    bestDistanceToOptimum = distanceToOptimum; // new optimum found
+                    potentialSwapPairs.splice(0); // clear previous options
+                }
+                potentialSwapPairs.push([playerTeamHigh, playerTeamLow]); // add swap option
+
+            }
+        }
 
         //Step 4: If any swap possibilities, pick one randomly and return true, if not return false
+        if (potentialSwapPairs.length > 0){
+            let randomIndex: number = Math.floor(Math.random() * (potentialSwapPairs.length - 1));
+            let [swapPlayerHigh, swapPlayerLow] = potentialSwapPairs[randomIndex];
+            higherTeam.removePlayer(swapPlayerHigh);
+            lowerTeam.removePlayer(swapPlayerLow);
+            higherTeam.addPlayer(swapPlayerLow);
+            lowerTeam.addPlayer(swapPlayerHigh);
+            return true;
+        }else{
+            return false;
+        }
 
-        return true;
     }
 
 }
