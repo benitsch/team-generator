@@ -165,9 +165,10 @@ export default class TeamGenerator {
                 let player: Player = new Player("FakeSubPlayer" + i);
                 player.addGameSkill(new GameSkill(game, avgPlayerSkill));
             }
+            
+            teamArray.push(additionalTeam); // add team with sub players to collection for balance optimizations
         }
 
-        teamArray.push(additionalTeam); // add team with sub players to collection for balance optimizations
 
         // optimize team balance as long as successful but at most until all swap options are exhausted
         const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getSkillForGame(game) - team2.getSkillForGame(game);};
