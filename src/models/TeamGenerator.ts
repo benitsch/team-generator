@@ -54,13 +54,13 @@ export default class TeamGenerator {
      * To ensure optimization on higher team skill differences there will be a refinement step at the end.
      * This refinement sorts teams by their teams skill and tries to swap team member between best and worst team to reach optimum:
      * 
-     * Let N be the amount of teams.
+     * Let N be the amount of teams and T the team size.
      * 
-     * Sort teams descending by ther skill.
+     * Sort teams by ther skill.
      * 
-     * Repeat optimization step N/2 times or until no further optimization can be achieved.
+     * Repeat optimization step N^2 * (T-1) times or until no further optimization can be achieved.
      * 
-     *  --> Compare best and worst team and if there's a skill diff then swap players until optimum reached.
+     *  --> Compare best and worst team and if there's a skill diff then swap the best possible player pair (choose random if several options).
      * 
      *  --> Sort teams again if optimization could be achieved for current team pair
      * 
