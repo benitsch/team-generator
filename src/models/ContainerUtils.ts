@@ -17,9 +17,10 @@ export class ContainerUtils {
     return mapping;
  }
 
- static sortMapAscendingByKey(map: Map<number, any>): Map<number, any> {
-    const ascendingComparer = (pairA: [number, any], pairB: [number, any]): number => {return pairB[0] - pairA[0]};
-    return new Map<number, any>([...map.entries()].sort(ascendingComparer));
+ static sortMapDescendingByKey(map: Map<number, any>): void {
+    const  descendingComparer= (pairA: [number, any], pairB: [number, any]): number => {return pairB[0] - pairA[0]};
+    let sortedMap: Map<number, any> = new Map<number, any>([...map].sort(descendingComparer));
+    map = sortedMap;
  }
 
 }

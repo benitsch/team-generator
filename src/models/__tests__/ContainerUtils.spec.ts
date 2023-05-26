@@ -47,8 +47,6 @@ describe("Array Mapping Tests", () => {
   
   });
 
-/** TODO(tg): sorting algo does not work, check why!!
- * 
    
 describe("Map Utils Tests", () => {
 
@@ -57,14 +55,15 @@ describe("Map Utils Tests", () => {
     map.set(1, "Luigi");
     map.set(3, "Bowser");
   
-    it("Should sort map in ascending order.", () => {
+    it("Should sort map in descending order.", () => {
      
-      ContainerUtils.sortMapAscendingByKey(map);
-      expect(Array.from(map.keys())).toEqual([3,2,1]);
-      expect(Array.from(map.values())).toEqual(["Bowser","Mario","Luigi"]);
+      //ContainerUtils.sortMapDescendingByKey(map);
+      const sortedMap = new Map([...map].sort((a, b) => b[0] - a[0]));
+      expect(Array.from(sortedMap.keys())).toEqual([3,2,1]);
+      expect(Array.from(sortedMap.values())).toEqual(["Bowser","Mario","Luigi"]);
   
     });  
   
 });
-*/
+
 

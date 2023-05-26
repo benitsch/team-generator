@@ -56,7 +56,7 @@ export default class TeamGenerator {
      * 
      * Let N be the amount of teams and T the team size.
      * 
-     * Sort teams by ther skill.
+     * Sort teams by their skill.
      * 
      * Repeat optimization step N^2 * (T-1) times or until no further optimization can be achieved.
      * 
@@ -93,7 +93,7 @@ export default class TeamGenerator {
             ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
 
         // order groups ascending
-        let orderedPlayerGroupMap = ContainerUtils.sortMapAscendingByKey<Array<Player>>(playerSkillMapping);
+        let orderedPlayerGroupMap = ContainerUtils.sortMapDescendingByKey<Array<Player>>(playerSkillMapping);
 
         // concatenate groups but shuffle within groups (same skill) beforehand to randomize a bit
         let orderedPlayerArray: Array<Player> = new Array<Player>();
