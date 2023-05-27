@@ -75,47 +75,102 @@ export default class TeamGenerator {
     public static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> | GeneratorErrorCode{
 
         //Step 1: do proper param check
-            
-        //--> at least 2 full teams need to be createable: players.length >= 2* teamSize
-        if(players.length < 2 * teamSize){
-            return GeneratorErrorCode.TeamSizeAndPlayerLengthMismatch;
-        }
-        //--> each player must have a valid assessment for the given game
-        for (const player of players){
-            if(!player.isSkillAssessedForGame(game)){
-                return GeneratorErrorCode.PlayerSkillsIncomplete;
-            }
+        let paramCheckResult: GeneratorErrorCode | undefined = this.validateGeneratorInput(players, teamSize, game);
+        if (paramCheckResult !== undefined){
+            return paramCheckResult;
         }
 
-        //Step 2: order players by their skill ascending and shuffle players with same skill in array
-        // group players with same skill
+        //Step 2: order players by their skill descending and shuffle players with same skill in array
+        let orderedPlayerArray: Array<Player> = this.orderPlayersDescendingByGameSkill(players, game);
+
+        
+        //Step 3: create X full teams and one additional team with remaining players if any
+        let [fullTeams, additionalTeam, avgPlayerSkill] = this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
+        
+
+        //Step 4: Refine team balance (swap players between best and worst team if possible)
+        // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
+        if (additionalTeam.fixedPlayers.length > 0){
+            for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
+                let player: Player = new Player("FakeSubPlayer" + i);
+                player.addGameSkill(new GameSkill(game, avgPlayerSkill));
+            }
+            fullTeams.push(additionalTeam); // add team with sub players to collection for balance optimizations
+        }
+
+        // optimize balance between teams
+        this.optimizeTeamSkillBalance(fullTeams, game);
+
+        // remove fake sub players again from additional team:
+        additionalTeam.clearSubstitutionPlayers();
+
+        return fullTeams;
+    }
+
+    /**
+     * 
+     * @param players 
+     * @param teamSize 
+     * @param game 
+     * @returns 
+     */
+    protected static validateGeneratorInput(players: Array<Player>, teamSize: number, game: Game): GeneratorErrorCode | undefined {
+       //--> at least 2 full teams need to be createable: players.length >= 2* teamSize
+       if(players.length < 2 * teamSize){
+        return GeneratorErrorCode.TeamSizeAndPlayerLengthMismatch;
+       }
+       //--> each player must have a valid assessment for the given game
+       for (const player of players){
+           if(!player.isSkillAssessedForGame(game)){
+               return GeneratorErrorCode.PlayerSkillsIncomplete;
+           }
+       }
+       return undefined;
+    }
+
+
+    /**
+     * 
+     * @param players 
+     * @param game 
+     * @returns 
+     */
+    protected static orderPlayersDescendingByGameSkill(players: Array<Player>, game: Game): Array<Player> {
+        // map players in groups by their game skill
         let playerSkillMapping: Map<number, Array<Player>> = 
             ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
 
-        // order groups ascending
-        let orderedPlayerGroupMap = ContainerUtils.sortMapDescendingByKey<Array<Player>>(playerSkillMapping);
+        // order groups descending
+        ContainerUtils.sortMapDescendingByKey<Array<Player>>(playerSkillMapping);
 
         // concatenate groups but shuffle within groups (same skill) beforehand to randomize a bit
         let orderedPlayerArray: Array<Player> = new Array<Player>();
-        for(const playerOfSameSkillArray of orderedPlayerGroupMap.values()){
+        for(const playerOfSameSkillArray of playerSkillMapping.values()){
             ContainerUtils.shuffleArray(playerOfSameSkillArray);
             orderedPlayerArray = orderedPlayerArray.concat(playerOfSameSkillArray);
         }
+        return orderedPlayerArray;
+    }
 
-        
-        //Step 3: calculate the amount of teams creatable out of the player list and create them(players.length % teamSize may be > 0)
-        // amount of teams that can be filled up with players
+    /**
+     * 
+     * @param orderedPlayerArray 
+     * @param teamSize 
+     * @returns 
+     */
+    protected static assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
+        // Create amount teams that can be fully filled
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
-        let teamArray: Array<Team> = new Array<Team>();
+        let fullTeams: Array<Team> = new Array<Team>();
         for (let i = 1; i <= amountOfFullTeams; i++){
-            teamArray.push(new Team("Team" + i, teamSize));
+            fullTeams.push(new Team("Team" + i, teamSize));
         }
 
+        // Create additional team for potential remaining players
         const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
-        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize); // will not be used if no remaining players
+        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize); // stays empty if no remaining players
 
-
-        //Step 4: Alternate between forward and backward looping over teams and add one player at a time(from high to low skill)
+        // Alternate between forward and backward looping over teams and add one player of ordered list at a time
         let teamIndex: number = 0;
         let forward: boolean = true;
         let playerSkillSum: number = 0;
@@ -125,8 +180,8 @@ export default class TeamGenerator {
 
             if(forward){ //alternating after each team has an additional player assigned
 
-                if (teamIndex < teamArray.length){
-                    teamArray.at(teamIndex)?.addPlayer(player);
+                if (teamIndex < fullTeams.length){
+                    fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex++;
                 }else{
                     // additional team gets last in forward iteration if limit allows
@@ -138,14 +193,14 @@ export default class TeamGenerator {
                 
             }else{ // backwards
 
-                if(teamIndex >= teamArray.length){
-                    teamIndex = teamArray.length - 1;
+                if(teamIndex >= fullTeams.length){
+                    teamIndex = fullTeams.length - 1;
                     // additional team gets first in backward iteration if limit allows
                     if(additionalTeam.currentSize < amountOfRemainingPlayers){
                         additionalTeam.addPlayer(player);
                     }
                 }else if(teamIndex >= 0){
-                    teamArray.at(teamIndex)?.addPlayer(player);
+                    fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex--;
                 }else{
                     teamIndex = 0;
@@ -154,38 +209,30 @@ export default class TeamGenerator {
             }
         }
 
+        const avgPlayerSkill: number = Math.round(playerSkillSum / orderedPlayerArray.length);
+        return [fullTeams, additionalTeam, avgPlayerSkill];
+    }
 
+    /**
+     * 
+     * @param teams 
+     * @param game 
+     */
+    protected static optimizeTeamSkillBalance(teams: Array<Team>, game: Game): void{
 
-        //Step 5: Refine team balance (swap players between best and worst team if possible)
-
-        // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
-        if (additionalTeam.fixedPlayers.length > 0){
-            const avgPlayerSkill: number = Math.round(playerSkillSum / orderedPlayerArray.length);
-            for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
-                let player: Player = new Player("FakeSubPlayer" + i);
-                player.addGameSkill(new GameSkill(game, avgPlayerSkill));
-            }
-            
-            teamArray.push(additionalTeam); // add team with sub players to collection for balance optimizations
-        }
-
-
-        // optimize team balance as long as successful but at most until all swap options are exhausted
         const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getSkillForGame(game) - team2.getSkillForGame(game);};
-        let maxSwapsLeft: number = teamArray.length * teamArray.length * (teamSize - 1); // (team size - 1) swaps per team pair.
+
+        let teamSize: number = teams[0].targetSize; // teams param must not be empty!!
+        let maxSwapsLeft: number = teams.length * teams.length * (teamSize - 1); // (team size - 1) swaps per team pair.
         let lastSwapSuccessful:boolean = true;
 
+        // optimize team balance as long as successful but at most until all swap options are exhausted
         while(lastSwapSuccessful && maxSwapsLeft > 0){
-            teamArray.sort(teamAscendingComparer);
-            // always try to swap one player between best and worst team:
-            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teamArray[0], teamArray[teamArray.length - 1], game);
+            teams.sort(teamAscendingComparer);
+            // try to swap one player between best and worst team:
+            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teams[0], teams[fullTeams.length - 1], game);
             maxSwapsLeft--;
         }
-
-        // remove fake sub players again from additional team:
-        additionalTeam.clearSubstitutionPlayers();
-
-        return teamArray;
     }
 
     /**
