@@ -178,6 +178,21 @@ import Game from "../Game";
 
    });
 
+   it("Shall allow to remove all fixed players at once.", () => {
+    const team: Team = new Team("team-name", 3);
+    expect(team.currentSize).toEqual(0);
+
+    const player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    const player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    expect(team.addPlayer(player1)).toBeTruthy;
+    expect(team.addPlayer(player2)).toBeTruthy;
+    expect(team.currentSize).toEqual(2);
+    
+    team.clearFixedPlayers();
+    expect(team.currentSize).toEqual(0);
+
+   });
+
    it("Shall allow to remove substitution players.", () => {
     const team: Team = new Team("team-name", 3);
     expect(team.currentSize).toEqual(0);
@@ -193,6 +208,21 @@ import Game from "../Game";
     expect(team.isPlayerInTeam(player2)).toBeFalsy;
 
     expect(team.isPlayerInTeam(player1)).toBeTruthy;
+
+   });
+
+   it("Shall allow to remove all substitution players at once.", () => {
+    const team: Team = new Team("team-name", 3);
+    expect(team.currentSize).toEqual(0);
+
+    const player1: Player = new Player("AWESOM-O", "Jon", "Doe");
+    const player2: Player = new Player("McAwesome", "Max", "Mustermann");
+    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.currentSize).toEqual(2);
+    
+    team.clearSubstitutionPlayers();
+    expect(team.currentSize).toEqual(0);
 
    });
 
