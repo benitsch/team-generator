@@ -3,7 +3,7 @@ import type Game from "@/models/Game";
 import GameSkill from "@/models/GameSkill";
 import Player from "@/models/Player";
 import Team from "@/models/Team";
-import {ContainerUtils} from "@/models/Utils";
+import {ContainerUtils} from "@/models/ContainerUtils";
 
 export enum GeneratorErrorCode {
     TeamSizeAndPlayerLengthMismatch = 1,
@@ -230,7 +230,7 @@ export default class TeamGenerator {
         while(lastSwapSuccessful && maxSwapsLeft > 0){
             teams.sort(teamAscendingComparer);
             // try to swap one player between best and worst team:
-            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teams[0], teams[fullTeams.length - 1], game);
+            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teams[0], teams[teams.length - 1], game);
             maxSwapsLeft--;
         }
     }
