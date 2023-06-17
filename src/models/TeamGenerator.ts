@@ -5,11 +5,18 @@ import Player from "@/models/Player";
 import Team from "@/models/Team";
 import {ContainerUtils} from "@/models/ContainerUtils";
 
+/** This error code is used to determine different invalid input constellations */
 export enum GeneratorErrorCode {
     TeamSizeAndPlayerLengthMismatch = 1,
     PlayerSkillsIncomplete,
   }
 
+  /**
+   * This team generator provides the functionality to create randomly assigned but balanced teams out of a given
+   * set of players.
+   * 
+   * It has one public static interface "generate" separated into several protected substeps.
+   */
 export default class TeamGenerator {
 
     /**
