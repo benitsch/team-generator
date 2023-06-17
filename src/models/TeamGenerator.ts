@@ -108,11 +108,16 @@ export default class TeamGenerator {
     }
 
     /**
+     * This function validates if the given players have an assessed skill for the given game
+     * and if there are enough players to create teams for the requestd size. At least
+     * 2 full teams must be creatable.
      * 
-     * @param players 
-     * @param teamSize 
-     * @param game 
-     * @returns 
+     * This validation shall be called prior to any other function call in the team generator!!!!
+     * 
+     * @param players The player list to be validated in length (at least 2 full teams)
+     * @param teamSize The team size to validate the player length with
+     * @param game The game which all players must have an assessed skill for
+     * @returns Error code if validation fails, undefined otherwise.
      */
     protected static validateGeneratorInput(players: Array<Player>, teamSize: number, game: Game): GeneratorErrorCode | undefined {
        //--> at least 2 full teams need to be createable: players.length >= 2* teamSize
@@ -130,10 +135,15 @@ export default class TeamGenerator {
 
 
     /**
+     * Orders players descending by ther game skill and shuffles positions between players with the same skill
+     * in order to introduce some randomness in the results.
      * 
-     * @param players 
-     * @param game 
-     * @returns 
+     * It is assumed that all players have a game skill assessed for the given game!!!
+     * Validation must happen prior to calling this function!!!
+     * 
+     * @param players The player array to be ordered by their game skill
+     * @param game The game for which the players shall be ordered
+     * @returns A descending ordered list of players.
      */
     protected static orderPlayersDescendingByGameSkill(players: Array<Player>, game: Game): Array<Player> {
         // map players in groups by their game skill
@@ -153,12 +163,28 @@ export default class TeamGenerator {
     }
 
     /**
+     * This function takes a list of players (ideally ordered by their game skill for balance reasons), the 
+     * requested team size and the game for which the players shall be teamed up. The result consists of 3
+     * elements:
+     * 1) An array of teams which are filled up to the requested team size
+     * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
+     *    But this extra team was also involved in balancing so it does not containt best or worst players only.
+     * 3) The average player skill for the given game.
      * 
-     * @param orderedPlayerArray 
-     * @param teamSize 
-     * @returns 
+     * If the given player list is not ordered by the players game skill this function will still return the
+     * mentioned results but balancing is not guaranteed. Balancing is achieved by assigning one player after
+     * another of the ordered player list to the teams alternating between first and last team to start with
+     * in each iteration.
+     * 
+     * 
+     * @param orderedPlayerArray The player list which is preferrably ordered by their game skill
+     * @param teamSize The size of the teams to be created
+     * @param game The game on which the ordering of the incoming player list is based on (needed to calc avg player skill)
+     * @returns A tuple containing the created full teams, a non full team if players are left over and the avg player skill
      */
     protected static assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
+        //TODO(tg): maybe call orderPlayerDescendingByGameSkill in here to ensure ordering!!!
+
         // Create amount teams that can be fully filled
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
         let fullTeams: Array<Team> = new Array<Team>();
@@ -214,9 +240,21 @@ export default class TeamGenerator {
     }
 
     /**
+     * This function takes a list of teams and optimizes the balancing between them.
+     * This is done by sorting the teams from best to worst and iteratively try to 
+     * swap 1 optimum player pair of the best and worst team and reshuffle the team
+     * array.
      * 
-     * @param teams 
-     * @param game 
+     * The single player swap is based on a greedy approach (local optimum) but since
+     * only one optimum player is swapped and not the whole team composition between
+     * best and worst team this optimization algorithm may aim for a global balance 
+     * optimum over all teams (to be verified).
+     * 
+     * Again this function assumes validation has been done to assure that all players
+     * within the team have their game skill assessed for the given game!!!!
+     * 
+     * @param teams The teams for which to optimize their balance
+     * @param game The game for which balancing shall be achieved
      */
     protected static optimizeTeamSkillBalance(teams: Array<Team>, game: Game): void{
 
