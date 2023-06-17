@@ -40,21 +40,11 @@ export default class Team {
     }
 
     addPlayer(player: Player): boolean {
-        if (!this.isFull && !this.isPlayerInTeam(player)){
-            this._playerList.push(player);
-            return true;
-        }else {
-            return false;
-        }
+        return (!this.isFull && !this.isPlayerInTeam(player)) ? (this._playerList.push(player), true) : false;
     }
 
     addSubstitutionPlayer(player: Player): boolean {
-        if (!this.isFull && !this.isPlayerInTeam(player)){
-            this._substitutionPlayerList.push(player);
-            return true;
-        }else {
-            return false;
-        }
+        return (!this.isFull && !this.isPlayerInTeam(player)) ? (this._substitutionPlayerList.push(player), true) : false;
     }
 
     removePlayer(player: Player): void {
