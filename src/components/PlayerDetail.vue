@@ -115,8 +115,7 @@ function ensureGameSkills() {
   if (player.value.gameSkills.length === 0 || player.value.gameSkills.length !== state.games.length) {
     state.games.forEach(game => {
       if (!player.value.gameSkills.some(skill => skill.game?.id === game.id)) {
-        const gameSkill = new GameSkill();
-        gameSkill.game = new Game();
+        const gameSkill = new GameSkill(new Game());
         player.value.gameSkills.push(gameSkill);
       }
     });

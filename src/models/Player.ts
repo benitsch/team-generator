@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from "uuid";
+import type Game from "@/models/Game";
 import type GameSkill from "@/models/GameSkill";
 
 export default class Player {
@@ -9,9 +10,23 @@ export default class Player {
     private _gameSkills: GameSkill[] = [];
 
 
-    constructor() {
+    constructor(tag?: string, firstName?: string, lastName?: string) {
         this._id = uuidv4();
+
+        if (tag){
+            this._tag = tag;
+        }
+        
+        if (firstName){
+            this._firstName = firstName;
+        }
+
+        if (lastName){
+            this._lastName = lastName;
+        }
+
     }
+
 
     get id(): string {
         return this._id;
@@ -56,6 +71,27 @@ export default class Player {
 
     addGameSkill(skill: GameSkill) {
         this._gameSkills.push(skill);
+    }
+
+    isSkillAssessedForGame(game: Game): boolean{
+        for (const gameSkill of this._gameSkills){
+            if(gameSkill.game === game){
+                if (gameSkill.skillLevel > 0){
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
+    getSkillForGame(game: Game): number {
+        for (const gameSkill of this._gameSkills){
+            if(gameSkill.game === game){
+                return gameSkill.skillLevel;
+            }
+        }
+        return 0;
     }
 
     getFullName(): string {
