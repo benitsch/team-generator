@@ -196,12 +196,12 @@ export default class TeamGenerator {
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
         let fullTeams: Array<Team> = new Array<Team>();
         for (let i = 1; i <= amountOfFullTeams; i++){
-            fullTeams.push(new Team("Team" + i, teamSize));
+            fullTeams.push(new Team("Team" + i, teamSize, game));
         }
 
         // Create additional team for potential remaining players
         const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
-        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize); // stays empty if no remaining players
+        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize, game); // stays empty if no remaining players
 
         // Alternate between forward and backward looping over teams and add one player of ordered list at a time
         let teamIndex: number = 0;
@@ -261,11 +261,10 @@ export default class TeamGenerator {
      * within the team have their game skill assessed for the given game!!!!
      * 
      * @param teams The teams for which to optimize their balance
-     * @param game The game for which balancing shall be achieved
      */
-    protected static optimizeTeamSkillBalance(teams: Array<Team>, game: Game): void{
+    protected static optimizeTeamSkillBalance(teams: Array<Team>): void{
 
-        const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getSkillForGame(game) - team2.getSkillForGame(game);};
+        const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getTeamGameSkill() - team2.getTeamGameSkill();};
 
         let teamSize: number = teams[0].targetSize; // teams param must not be empty!!
         let maxSwapsLeft: number = teams.length * teams.length * (teamSize - 1); // (team size - 1) swaps per team pair.
@@ -275,7 +274,7 @@ export default class TeamGenerator {
         while(lastSwapSuccessful && maxSwapsLeft > 0){
             teams.sort(teamAscendingComparer);
             // try to swap one player between best and worst team:
-            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teams[0], teams[teams.length - 1], game);
+            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(teams[0], teams[teams.length - 1]);
             maxSwapsLeft--;
         }
     }
@@ -292,14 +291,14 @@ export default class TeamGenerator {
      * 
      * @param team1 The first team to be balanced.
      * @param team2 The second team to be balanced with.
-     * @param game The game on which the skills between the teams will be compared for possible swaps.
      * @returns true if one pair of players could be swapped to decrease the skill diff, false otherwise.
      */
-    protected static trySwapPlayerForBetterBalance(team1: Team, team2: Team, game: Game): boolean{
+    protected static trySwapPlayerForBetterBalance(team1: Team, team2: Team): boolean{
 
         //Step 1: Calc skill diff for given game
-        let teamSkill1: number = team1.getSkillForGame(game);
-        let teamSkill2: number = team2.getSkillForGame(game);
+        let game: Game = team1.game;
+        let teamSkill1: number = team1.getTeamGameSkill();
+        let teamSkill2: number = team2.getTeamGameSkill();
         let teamSkillDiff: number = Math.abs(teamSkill1 - teamSkill2);
 
         if (teamSkillDiff <= 1) { // no better balance possible as only 1 skill point can be shifted at most
