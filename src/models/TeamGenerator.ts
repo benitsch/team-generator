@@ -9,6 +9,7 @@ import {ContainerUtils} from "@/models/ContainerUtils";
 export enum GeneratorErrorCode {
     TeamSizeAndPlayerLengthMismatch = 1,
     PlayerSkillsIncomplete,
+    PlayerListContainsDuplicates,
   }
 
   /**
@@ -79,7 +80,7 @@ export default class TeamGenerator {
      * @param game The game on which the balancing will be based (all players must be assessed with a skill >= 0 for this game)
      * @returns A set of randomly assembled but balanced teams.
      */
-    public static generate(players: Array<Player>, teamSize: number ,game: Game): Array<Team> | GeneratorErrorCode{
+    public static generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode{
 
         //Step 1: do proper param check
         let paramCheckResult: GeneratorErrorCode | undefined = this.validateGeneratorInput(players, teamSize, game);
@@ -127,6 +128,14 @@ export default class TeamGenerator {
      * @returns Error code if validation fails, undefined otherwise.
      */
     protected static validateGeneratorInput(players: Array<Player>, teamSize: number, game: Game): GeneratorErrorCode | undefined {
+        //--> playerlist must not contain duplicates
+        for(let i = 0; i < players.length; i++){
+            for (let j = i + 1; j < players.length; j++){
+                if (players.at(i) === players.at(j)){ // TODO(tg): only reference check, deep comparison necessary?
+                    return GeneratorErrorCode.PlayerListContainsDuplicates;
+                }
+            }
+        }
        //--> at least 2 full teams need to be createable: players.length >= 2* teamSize
        if(players.length < 2 * teamSize){
         return GeneratorErrorCode.TeamSizeAndPlayerLengthMismatch;
