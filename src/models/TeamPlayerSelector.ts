@@ -30,12 +30,24 @@ export default class TeamPlayerSelector {
         
         // Step 3: add random players from list
         let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
-        let randomPlayers: Array<Player> = this.selectRandomPlayers(players, amountOfPlayersToAdd);
+        let [randomPlayers, remainingPlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
 
         // Step 4: check if team within bounds
+        let totalSkill: number = team.getTeamGameSkill();
+        for(const player of randomPlayers){
+            totalSkill += player.getSkillForGame(team.game);
+        }
+
+        if (totalSkill >= minTeamSkill && totalSkill <= maxTeamSkill){
+            return randomPlayers;
+        }
 
         // Step 5:  if team above MAX then optimize by replacing highest player (of newly added)
         //          if team below MIN then optimize by replacing lowest player (of newly added)
+        // TODO(tg):    swap 1 remaining player with first fitting random player (which ensures that team is in bounds)
+        //              if none fitting track optimum to swap with this one
+        //              repeat step one until fitting remaining swap player found or no remaining players available
+        
 
         // Step 6: return team or error if no players could be added without violating the boundaries??
         return new Array<Player>();
@@ -94,17 +106,21 @@ export default class TeamPlayerSelector {
      * @param amount The amount of random players to be selected.
      * @returns An array of randomly selected players.
      */
-    protected static selectRandomPlayers(players: Array<Player>, amount: number): Array<Player> {
-        let resultPlayers: Array<Player> = players;
-        let playersToRemove: number = resultPlayers.length > amount? resultPlayers.length - amount : 0;
+    protected static selectRandomPlayers(players: Array<Player>, amount: number): [Array<Player>, Array<Player>] {
+        let randomPlayers: Array<Player> = players;
+        let playersToRemove: number = randomPlayers.length > amount? randomPlayers.length - amount : 0;
+        let remainingPlayers: Array<Player> = new Array<Player>();
 
         while (playersToRemove > 0){
-            let randomIndex: number = Math.floor(Math.random() * (resultPlayers.length - 1));
-            resultPlayers.splice(randomIndex, 1);
+            let randomIndex: number = Math.floor(Math.random() * (randomPlayers.length - 1));
+            let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0); //TODO(tg): check how to ensure result is not undefined!!!
+            if (removedPlayer !== undefined){
+                remainingPlayers.push(removedPlayer);
+            }
             playersToRemove --;
         }
 
-        return resultPlayers;
+        return [randomPlayers, remainingPlayers];
 
     } 
 }
