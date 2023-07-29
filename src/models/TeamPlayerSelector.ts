@@ -28,8 +28,9 @@ export default class TeamPlayerSelector {
             return validationResult;
         }
         
-
         // Step 3: add random players from list
+        let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
+        let randomPlayers: Array<Player> = this.selectRandomPlayers(players, amountOfPlayersToAdd);
 
         // Step 4: check if team within bounds
 
@@ -84,4 +85,26 @@ export default class TeamPlayerSelector {
         return undefined;
     }
 
+    /**
+     * This function returns a random selection of players from the given input.
+     * If the the requested amount exceeds the given amount of players the player array
+     * will be returned as it is.
+     * 
+     * @param players The players to select randomly from.
+     * @param amount The amount of random players to be selected.
+     * @returns An array of randomly selected players.
+     */
+    protected static selectRandomPlayers(players: Array<Player>, amount: number): Array<Player> {
+        let resultPlayers: Array<Player> = players;
+        let playersToRemove: number = resultPlayers.length > amount? resultPlayers.length - amount : 0;
+
+        while (playersToRemove > 0){
+            let randomIndex: number = Math.floor(Math.random() * (resultPlayers.length - 1));
+            resultPlayers.splice(randomIndex, 1);
+            playersToRemove --;
+        }
+
+        return resultPlayers;
+
+    } 
 }
