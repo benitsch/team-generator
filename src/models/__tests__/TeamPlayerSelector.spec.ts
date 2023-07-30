@@ -4,6 +4,7 @@ import Game from "../Game";
 import Team from "../Team";
 import Player from "../Player";
 import TeamPlayerSelector from "../TeamPlayerSelector";
+import OptimalTeamPlayerSelector from "../TeamPlayerSelector";
 import {SelectorErrorCode } from "../TeamPlayerSelector";
 import GameSkill from "../GameSkill";
 
@@ -18,6 +19,8 @@ describe("Select Suitable Players Test", () => {
     let team: Team = new Team("HotOnes", 5, game);
     team.addPlayer(lonePlayer);
 
+    let selector: TeamPlayerSelector = new OptimalTeamPlayerSelector();
+
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
 
@@ -31,7 +34,7 @@ describe("Select Suitable Players Test", () => {
         const minTeamSkill: number = 10;
         const maxTeamSkill: number = 20;
     
-        const selectResult: Array<Player> | SelectorErrorCode = TeamPlayerSelector.selectSuitablePlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
+        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
         console.log("RESULT CODE = " + selectResult);
         expect(selectResult).instanceOf(Array<Player>);
 

@@ -8,9 +8,14 @@ export enum SelectorErrorCode {
     TeamAlreadyFull,
     PlayerListContainsTeamMembers,
     PlayerListContainsDuplicates,
-  }
+}
 
-export default class TeamPlayerSelector {
+export default interface TeamPlayerSelector {
+
+    public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode;
+}
+
+export default class OptimalTeamPlayerSelector {
 
 
     /**
@@ -31,7 +36,7 @@ export default class TeamPlayerSelector {
      * @param maxTeamSkill The maximum desired skill that the team should have with the selected players.
      * @returns 
      */
-    public static selectSuitablePlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
+    public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
 
         // Step 1: Check if team does even need players to fill up
         if (team.isFull){
@@ -64,7 +69,7 @@ export default class TeamPlayerSelector {
      * @param team The team to check the amount of players to be added and game to be played.
      * @returns Error code if validation fails, undefined otherwise.
      */
-    protected static validateSelectorInput(players: Array<Player>, team: Team): SelectorErrorCode | undefined {
+    protected validateSelectorInput(players: Array<Player>, team: Team): SelectorErrorCode | undefined {
 
         //--> playerlist must not contain duplicates
         for(let i = 0; i < players.length; i++){
@@ -107,7 +112,7 @@ export default class TeamPlayerSelector {
      * @param amount The amount of random players to be selected.
      * @returns An array of randomly selected players.
      */
-    protected static selectRandomPlayers(players: Array<Player>, amount: number): [Array<Player>, Array<Player>] {
+    protected selectRandomPlayers(players: Array<Player>, amount: number): [Array<Player>, Array<Player>] {
         let randomPlayers: Array<Player> = players;
         let playersToRemove: number = randomPlayers.length > amount? randomPlayers.length - amount : 0;
         let remainingPlayers: Array<Player> = new Array<Player>();
@@ -140,7 +145,7 @@ export default class TeamPlayerSelector {
      * @param maxTeamSkill The upper bound of the allowed team skill range.
      * @returns An array of players optimized allowing the team to be in skill range or as close as possible to the valid range.
      */
-    protected static optimizePlayerSelectionOutOfRange(currentPlayerSelection: Array<Player>, alternativePlayers: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player>{
+    protected optimizePlayerSelectionOutOfRange(currentPlayerSelection: Array<Player>, alternativePlayers: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player>{
 
         // calculate teamskill for current selection
         let totalTeamSkill: number = team.getTeamGameSkill();
