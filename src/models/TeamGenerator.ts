@@ -107,7 +107,7 @@ export default class TeamGenerator {
         }
 
         // optimize balance between teams
-        this.optimizeTeamSkillBalance(fullTeams, game);
+        this.optimizeTeamSkillBalance(fullTeams);
 
         // remove fake sub players again from additional team:
         additionalTeam.clearSubstitutionPlayers();
@@ -314,7 +314,7 @@ export default class TeamGenerator {
             return false; 
         }
 
-        //Step 2: check which team is better in given game
+        //Step 2: Check which team is better in given game
         let higherTeam: Team = teamSkill1 > teamSkill2? team1 : team2;
         let lowerTeam: Team = teamSkill1 < teamSkill2? team1 : team2;
 
@@ -335,7 +335,7 @@ export default class TeamGenerator {
 
                 let distanceToOptimum: number = Math.abs(optimumSkillShift - skillGainLowerTeam);
                 if (distanceToOptimum > bestDistanceToOptimum){
-                    continue; // skip if there are already better options
+                    continue; // skip if there are already better options or swap does not optimize teams
                 }
                 if (distanceToOptimum < bestDistanceToOptimum){
                     bestDistanceToOptimum = distanceToOptimum; // new optimum found
