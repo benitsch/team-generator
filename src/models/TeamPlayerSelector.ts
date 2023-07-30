@@ -1,5 +1,3 @@
-import Game from "@/models/Game";
-import GameSkill from "@/models/GameSkill";
 import Player from "@/models/Player";
 import Team from "@/models/Team";
 
@@ -15,6 +13,24 @@ export enum SelectorErrorCode {
 export default class TeamPlayerSelector {
 
 
+    /**
+     * Generates a set of randomly selected players to complement a team optimized to a given skill range.
+     * If the given set of players does not allow for the team to be within the given skill range the function
+     * will provide a selection that is as close to the given skill ranges bounds (minimum or maximum respectively) 
+     * as possible.
+     * 
+     * The function will validate the given input for missing player game skill assessments, player duplicates or if 
+     * given players are already on the team and if there are enough players provided to fill up the team. The team
+     * will be checked if it even requires players to fill up.
+     * 
+     *
+     * 
+     * @param players The players to select from as an addition to the team.
+     * @param team The team to select the players for.
+     * @param minTeamSkill The minimum desired skill that the team should have with the selected players.
+     * @param maxTeamSkill The maximum desired skill that the team should have with the selected players.
+     * @returns 
+     */
     public static selectSuitablePlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
 
         // Step 1: Check if team does even need players to fill up
@@ -28,29 +44,13 @@ export default class TeamPlayerSelector {
             return validationResult;
         }
         
-        // Step 3: add random players from list
+        // Step 3: Select random players from list
         let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
-        let [randomPlayers, remainingPlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
+        let [randomPlayerSelection, alternativePlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
 
-        // Step 4: check if team within bounds
-        let totalSkill: number = team.getTeamGameSkill();
-        for(const player of randomPlayers){
-            totalSkill += player.getSkillForGame(team.game);
-        }
+        // Step 4: Check if team within bounds and optimize if not
+        return this.optimizePlayerSelectionOutOfRange(randomPlayerSelection, alternativePlayers, team, minTeamSkill, maxTeamSkill);
 
-        if (totalSkill >= minTeamSkill && totalSkill <= maxTeamSkill){
-            return randomPlayers;
-        }
-
-        // Step 5:  if team above MAX then optimize by replacing highest player (of newly added)
-        //          if team below MIN then optimize by replacing lowest player (of newly added)
-        // TODO(tg):    swap 1 remaining player with first fitting random player (which ensures that team is in bounds)
-        //              if none fitting track optimum to swap with this one
-        //              repeat step one until fitting remaining swap player found or no remaining players available
-        
-
-        // Step 6: return team or error if no players could be added without violating the boundaries??
-        return new Array<Player>();
     }
 
     /**
@@ -122,5 +122,82 @@ export default class TeamPlayerSelector {
 
         return [randomPlayers, remainingPlayers];
 
-    } 
+    }
+
+    /**
+     * Checks if a given selection of players to be added to the team allow the team's skill to be within a specified range (min,max).
+     * If not the function will try to swap players of the current selection with alternatives to find a solution which would allow
+     * the team skill to be within range. If this is not possible with the given alternatives the function will try to minimize the
+     * gap to the to either the lower or upper team skill bound respectively if possible.
+     *  
+     * NOTE: This function will not alter any of the input parameters!
+     * 
+     * @param currentPlayerSelection The players selected as addition to the team.
+     * @param alternativePlayers The alternative players.
+     * @param team The team to get skill references from.
+     * @param minTeamSkill The lower bound of the allowed team skill range.
+     * @param maxTeamSkill The upper bound of the allowed team skill range.
+     * @returns An array of players optimized allowing the team to be in skill range or as close as possible to the valid range.
+     */
+    protected static optimizePlayerSelectionOutOfRange(currentPlayerSelection: Array<Player>, alternativePlayers: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player>{
+
+        // calculate teamskill for current selection
+        let totalTeamSkill: number = team.getTeamGameSkill();
+        for(const player of currentPlayerSelection){
+            totalTeamSkill += player.getSkillForGame(team.game);
+        }
+
+        // return current player selection if already in range
+        if (minTeamSkill <= totalTeamSkill && totalTeamSkill <= maxTeamSkill){
+            return currentPlayerSelection;
+        }
+
+        // determine optimum team skill as reference for best swap selection
+        let optimumTeamSkill: number = Math.abs(maxTeamSkill - minTeamSkill) / 2;
+
+        // swap current selection players with alternatives until teamskill is in range
+        // or swap if teamskill improves towards optimum (best we can do even if not in given skill range)
+        let optimizedSelection: Array<Player> = currentPlayerSelection;
+        for (const alternativePlayer of alternativePlayers){
+
+            // keep track of best possible swap selection if alternative does not allow team to get in range
+            let potentialSwapPlayer: Player | undefined = undefined;
+            let bestDistanceToOptimum: number = Math.abs(totalTeamSkill - optimumTeamSkill); //current best distance to optimum
+
+            for (const player of optimizedSelection){
+
+                let teamSkillOnSwap: number = totalTeamSkill - player.getSkillForGame(team.game) + alternativePlayer.getSkillForGame(team.game);
+
+                // CASE 1: 
+                // check if swap would already move team skill within range between min and max
+                // stop here if it does and return the improved selection
+                if(minTeamSkill <= teamSkillOnSwap && teamSkillOnSwap <= maxTeamSkill){
+                    let playerIndexToRemove: number = optimizedSelection.indexOf(player);
+                    optimizedSelection.splice(playerIndexToRemove, 1);
+                    optimizedSelection.push(alternativePlayer);
+                    return optimizedSelection;
+                }
+
+                // CASE 2:
+                // alternative does not move team already in range, let's check if alternative would
+                // at least improve team towards optimum and update current best swap option
+                let distanceToOptimum: number = Math.abs(teamSkillOnSwap - optimumTeamSkill);
+                if (bestDistanceToOptimum > distanceToOptimum){
+                    bestDistanceToOptimum = distanceToOptimum;
+                    potentialSwapPlayer = player;
+                }
+            }
+
+            // apply current best swap option if any and continue with next alternative
+            if (potentialSwapPlayer != undefined){
+                let playerIndexToRemove: number = optimizedSelection.indexOf(potentialSwapPlayer);
+                    optimizedSelection.splice(playerIndexToRemove, 1);
+                    optimizedSelection.push(alternativePlayer);
+                    totalTeamSkill = totalTeamSkill - potentialSwapPlayer.getSkillForGame(team.game) + alternativePlayer.getSkillForGame(team.game);
+            }
+        }
+
+        return optimizedSelection;
+
+    }
 }
