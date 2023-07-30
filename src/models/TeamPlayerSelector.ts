@@ -84,13 +84,14 @@ export default class TeamPlayerSelector {
         }
 
         //--> at least missing amount of players to fill up team
-        if(players.length >= (team.targetSize - team.currentSize)){
+        if(players.length <= (team.targetSize - team.currentSize)){
          return SelectorErrorCode.NotEnoughPlayersProvided;
         }
 
         //--> each player must have a valid assessment for the given game
         for (const player of players){
             if(!player.isSkillAssessedForGame(team.game)){
+                console.log("SKILL NOT ASSESSED FOR PLAYER " + player.tag);
                 return SelectorErrorCode.PlayerSkillsIncomplete;
             }
         }
