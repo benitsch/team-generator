@@ -8,6 +8,8 @@ export enum SelectorErrorCode {
     TeamAlreadyFull,
     PlayerListContainsTeamMembers,
     PlayerListContainsDuplicates,
+    MinTeamSkillExceedsMax,
+    TeamSkillRangeNegative
 }
 
 export default interface TeamPlayerSelector {
@@ -37,6 +39,14 @@ export default class OptimalTeamPlayerSelector {
      * @returns 
      */
     public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
+
+        if (minTeamSkill < 0 || maxTeamSkill < 0){
+            return SelectorErrorCode.TeamSkillRangeNegative;
+        }
+
+        if (minTeamSkill > maxTeamSkill){
+            return SelectorErrorCode.MinTeamSkillExceedsMax;
+        }
 
         // Step 1: Check if team does even need players to fill up
         if (team.isFull){
@@ -119,7 +129,7 @@ export default class OptimalTeamPlayerSelector {
 
         while (playersToRemove > 0){
             let randomIndex: number = Math.floor(Math.random() * (randomPlayers.length - 1));
-            let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0); //TODO(tg): check how to ensure result is not undefined!!!
+            let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0);
             if (removedPlayer !== undefined){
                 remainingPlayers.push(removedPlayer);
             }
