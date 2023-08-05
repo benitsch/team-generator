@@ -3,16 +3,18 @@ import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 
 export default class Team {
-    private _id = "";
-    private _name = "";
-    private _targetSize = 0;
+    private _id: string = "";
+    private _name: string = "";
+    private _targetSize: number = 0;
     private _playerList: Array<Player> = [];
     private _substitutionPlayerList: Array<Player> = [];
+    private _game: Game;
 
-    constructor(name: string, targetSize: number) {
+    constructor(name: string, targetSize: number, game: Game) {
         this._id = uuidv4();
         this._name = name;
         this._targetSize = targetSize;
+        this._game = game;
     }
 
     get id(): string {
@@ -39,12 +41,16 @@ export default class Team {
         return this.currentSize == this.targetSize;
     }
 
+    get game(): Game {
+        return this._game;
+    }
+
     addPlayer(player: Player): boolean {
-        return (!this.isFull && !this.isPlayerInTeam(player)) ? (this._playerList.push(player), true) : false;
+        return (!this.isFull && !this.isPlayerInTeam(player) && player.isSkillAssessedForGame(this.game)) ? (this._playerList.push(player), true) : false;
     }
 
     addSubstitutionPlayer(player: Player): boolean {
-        return (!this.isFull && !this.isPlayerInTeam(player)) ? (this._substitutionPlayerList.push(player), true) : false;
+        return (!this.isFull && !this.isPlayerInTeam(player) && player.isSkillAssessedForGame(this.game)) ? (this._substitutionPlayerList.push(player), true) : false;
     }
 
     removePlayer(player: Player): void {
@@ -71,22 +77,10 @@ export default class Team {
         return this._playerList.includes(player) || this._substitutionPlayerList.includes(player);
     }
 
-    isSkillAssessedForGame(game: Game): boolean{
-        if(this.fixedPlayers.length === 0){
-            return false;
-        }
-        for (const player of this.allPlayers){
-            if(!player.isSkillAssessedForGame(game)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    getSkillForGame(game: Game): number {
+    getTeamGameSkill(): number {
         let skill: number = 0;
         for (const player of this.allPlayers){
-            skill += player.getSkillForGame(game);
+            skill += player.getSkillForGame(this.game);
         }
         return skill;
     }
