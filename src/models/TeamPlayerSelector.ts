@@ -12,12 +12,30 @@ export enum SelectorErrorCode {
     TeamSkillRangeNegative
 }
 
+/**
+ * Team player selector interface.
+ */
 export default interface TeamPlayerSelector {
 
+    /**
+     * Selects players to fill up a team for a specific game within a given skill range.
+     * At least the missing amount of players in the team must be covered with the given player selection
+     * and all players must be skill assessed for the team's game. The function will return a selection of 
+     * players which aim to keep the team's skill between a given min and max. If this cannot be achieved
+     * the function shall return a player selection as close as possible to the given range.
+     * 
+     * 
+     * @param players The players to select from.
+     * @param team The team to fill up with players.
+     * @param minTeamSkill The mininum skill the team shall have.
+     * @param maxTeamSkill The maximum skill the team shall have.
+     * 
+     * @returns a player selection for the team or an error code.
+     */
     public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode;
 }
 
-export default class OptimalTeamPlayerSelector {
+export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
 
     /**
