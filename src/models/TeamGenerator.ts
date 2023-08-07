@@ -13,12 +13,29 @@ export enum GeneratorErrorCode {
   }
 
   /**
+   * Team generator interface.
+   */
+export default interface TeamGenerator {
+    /**
+     * Generates teams from a set of given players for a specific game (all players need gameskill assessed)
+     * and a given team size.
+     * 
+     * @param players The players to generate teams from.
+     * @param teamSize The team size desired for the returned teams.
+     * @param game The game the skill balancing shall be based on.
+     * 
+     * @returns a set of teams or an error code.
+     */
+    public generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode;
+}
+
+  /**
    * This team generator provides the functionality to create randomly assigned but balanced teams out of a given
    * set of players.
    * 
    * It has one public static interface "generate" separated into several protected substeps.
    */
-export default class TeamGenerator {
+export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
     /**
      * Generates a set of randomly assembled but balanced teams out of a set of given players and specified team size for a given game.
@@ -80,7 +97,7 @@ export default class TeamGenerator {
      * @param game The game on which the balancing will be based (all players must be assessed with a skill >= 0 for this game)
      * @returns A set of randomly assembled but balanced teams.
      */
-    public static generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode{
+    public generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode{
 
         //Step 1: do proper param check
         let paramCheckResult: GeneratorErrorCode | undefined = this.validateGeneratorInput(players, teamSize, game);
@@ -127,7 +144,7 @@ export default class TeamGenerator {
      * @param game The game which all players must have an assessed skill for
      * @returns Error code if validation fails, undefined otherwise.
      */
-    protected static validateGeneratorInput(players: Array<Player>, teamSize: number, game: Game): GeneratorErrorCode | undefined {
+    protected validateGeneratorInput(players: Array<Player>, teamSize: number, game: Game): GeneratorErrorCode | undefined {
         //--> playerlist must not contain duplicates
         for(let i = 0; i < players.length; i++){
             for (let j = i + 1; j < players.length; j++){
@@ -161,7 +178,7 @@ export default class TeamGenerator {
      * @param game The game for which the players shall be ordered
      * @returns A descending ordered list of players.
      */
-    protected static orderPlayersDescendingByGameSkill(players: Array<Player>, game: Game): Array<Player> {
+    protected orderPlayersDescendingByGameSkill(players: Array<Player>, game: Game): Array<Player> {
         // map players in groups by their game skill
         let playerSkillMapping: Map<number, Array<Player>> = 
             ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
@@ -198,7 +215,7 @@ export default class TeamGenerator {
      * @param game The game on which the ordering of the incoming player list is based on (needed to calc avg player skill)
      * @returns A tuple containing the created full teams, a non full team if players are left over and the avg player skill
      */
-    protected static assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
+    protected assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
         //TODO(tg): maybe call orderPlayerDescendingByGameSkill in here to ensure ordering!!!
 
         // Create amount teams that can be fully filled
@@ -271,7 +288,7 @@ export default class TeamGenerator {
      * 
      * @param teams The teams for which to optimize their balance
      */
-    protected static optimizeTeamSkillBalance(teams: Array<Team>): void{
+    protected optimizeTeamSkillBalance(teams: Array<Team>): void{
 
         const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getTeamGameSkill() - team2.getTeamGameSkill();};
 
@@ -302,7 +319,7 @@ export default class TeamGenerator {
      * @param team2 The second team to be balanced with.
      * @returns true if one pair of players could be swapped to decrease the skill diff, false otherwise.
      */
-    protected static trySwapPlayerForBetterBalance(team1: Team, team2: Team): boolean{
+    protected trySwapPlayerForBetterBalance(team1: Team, team2: Team): boolean{
 
         //Step 1: Calc skill diff for given game
         let game: Game = team1.game;
