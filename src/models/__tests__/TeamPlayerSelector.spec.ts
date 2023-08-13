@@ -68,8 +68,8 @@ describe("TeamPlayerSelectorTest", () => {
             totalTeamSkill += player.getSkillForGame(game);
         }
 
-        expect(totalTeamSkill >= minTeamSkill);
-        expect(totalTeamSkill <= maxTeamSkill);
+        expect(totalTeamSkill).toBeGreaterThanOrEqual(minTeamSkill);
+        expect(totalTeamSkill).toBeLessThanOrEqual(maxTeamSkill);
      
     });
 

@@ -35,7 +35,7 @@ describe("Generate Team Test", () => {
         expect(teams.length).toEqual(3);
 
         for (let team of teams){
-            expect(team.targetSize === teamSize);
+            expect(team.targetSize).toEqual(teamSize);
             expect(team.isFull).toBeTruthy;
         }
      
