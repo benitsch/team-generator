@@ -71,6 +71,74 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
      
     });
 
+    it("Shall generate the expected amount teams with one team that is missing 1 player.", () => {
+
+        const teamSize: number = 3;
+        const amountOfPlayers = 8; // one team will have only 2 players
+    
+        let players: Array<Player> = new Array<Player>();
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            let player: Player = new Player("Player"+i);
+            player.addGameSkill(new GameSkill(game, i%5 + 1));
+            players.push(player);
+        }
+
+        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
+        const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
+        expect(generateResult).instanceOf(Array<Team>);
+
+        const teams: Array<Team> = generateResult as Array<Team>;
+
+        expect(teams.length).toEqual(3);
+
+        let teamsNotFull: number = 0;
+        for (let team of teams){
+            expect(team.targetSize).toEqual(teamSize);
+            if(!team.isFull){
+                expect(team.currentSize).toEqual(team.targetSize - 1);
+                teamsNotFull++;
+            }
+        }
+
+        expect(teamsNotFull).toEqual(1);
+     
+    });
+
+    it("Shall generate the expected amount teams with one team that has only one player.", () => {
+
+        const teamSize: number = 3;
+        const amountOfPlayers = 7; // one team will have only 1 player
+    
+        let players: Array<Player> = new Array<Player>();
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            let player: Player = new Player("Player"+i);
+            player.addGameSkill(new GameSkill(game, i%5 + 1));
+            players.push(player);
+        }
+
+        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
+        const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
+        expect(generateResult).instanceOf(Array<Team>);
+
+        const teams: Array<Team> = generateResult as Array<Team>;
+
+        expect(teams.length).toEqual(3);
+
+        let teamsNotFull: number = 0;
+        for (let team of teams){
+            expect(team.targetSize).toEqual(teamSize);
+            if(!team.isFull){
+                expect(team.currentSize).toEqual(1);
+                teamsNotFull++;
+            }
+        }
+
+        expect(teamsNotFull).toEqual(1);
+     
+    });
+
    
  
   });
