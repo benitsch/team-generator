@@ -35,8 +35,8 @@ describe("Array Mapping Tests", () => {
       const parityFn = (a: number): string => {return (a % 2 === 0)? "even" : "odd"; };
       let mapping: Map<string, Array<number>> = ContainerUtils.groupElementsByProperty<string>(array, parityFn);
       expect(mapping.size).toEqual(2);
-      expect(mapping.has("odd")).toBeTruthy;
-      expect(mapping.has("even")).toBeTruthy;
+      expect(mapping.has("odd")).toBe(true);
+      expect(mapping.has("even")).toBe(true);
       expect(mapping.get("odd")?.length).toEqual(2);
       expect(mapping.get("even")?.length).toEqual(1);
       expect(mapping.get("odd")).toContain(1);

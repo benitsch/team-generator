@@ -18,7 +18,7 @@ player2.addGameSkill(new GameSkill(game, 5));
     expect(team.name).toEqual("team-name");
     expect(team.targetSize).toEqual(3);
     expect(team.currentSize).toEqual(0);
-    expect(team.isFull).toBeFalsy;
+    expect(team.isFull).toBe(false);
    });
   
 
@@ -37,28 +37,28 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
-    expect(team.isFull).toBeFalsy;
+    expect(team.isFull).toBe(false);
    });
 
    it("Shall allow to add substitution player when not already full.", () => {
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
-    expect(team.isFull).toBeFalsy;
+    expect(team.isFull).toBe(false);
    });
 
    it("Shall not allow to add the same player twice.", () => {
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
 
-    expect(team.addPlayer(player1)).toBeFalsy;
+    expect(team.addPlayer(player1)).toBe(false);
     expect(team.currentSize).toEqual(1);
 
    });
@@ -67,10 +67,10 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeFalsy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(false);
     expect(team.currentSize).toEqual(1);
 
    });
@@ -79,10 +79,10 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeFalsy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(false);
     expect(team.currentSize).toEqual(1);
 
    });
@@ -91,10 +91,10 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(true);
     expect(team.currentSize).toEqual(1);
 
-    expect(team.addPlayer(player1)).toBeFalsy;
+    expect(team.addPlayer(player1)).toBe(false);
     expect(team.currentSize).toEqual(1);
 
    });
@@ -103,8 +103,8 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
 
    });
@@ -113,8 +113,8 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
-    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(true);
+    expect(team.addSubstitutionPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
 
    });
@@ -123,11 +123,11 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addSubstitutionPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
-    expect(team.isPlayerInTeam(player1)).toBeTruthy;
-    expect(team.isPlayerInTeam(player2)).toBeTruthy;
+    expect(team.isPlayerInTeam(player1)).toBe(true);
+    expect(team.isPlayerInTeam(player2)).toBe(true);
     expect(team.fixedPlayers).toContain(player1);
     expect(team.substitutionPlayers).toContain(player2);
 
@@ -139,10 +139,10 @@ player2.addGameSkill(new GameSkill(game, 5));
 
     const player3: Player = new Player("SkillUnkown", "Jon", "Doe");
 
-    expect(team.addPlayer(player3)).toBeFalsy
+    expect(team.addPlayer(player3)).toBe(false)
     expect(team.fixedPlayers).not.toContain(player3);
 
-    expect(team.addSubstitutionPlayer(player3)).toBeFalsy
+    expect(team.addSubstitutionPlayer(player3)).toBe(false)
     expect(team.substitutionPlayers).not.toContain(player3);
 
    });
@@ -151,16 +151,16 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 2, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
     expect(team.fixedPlayers).toContain(player1);
     expect(team.fixedPlayers).toContain(player2);
-    expect(team.isFull).toBeTruthy;
+    expect(team.isFull).toBe(true);
 
     const player3: Player = new Player("NotInvited", "The", "Devil");
     player3.addGameSkill(new GameSkill(game, 3));
-    expect(team.addPlayer(player3)).toBeFalsy
+    expect(team.addPlayer(player3)).toBe(false)
     expect(team.fixedPlayers).not.toContain(player3);
 
    });
@@ -169,15 +169,15 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addSubstitutionPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
     
     team.removePlayer(player1);
     expect(team.currentSize).toEqual(1);
-    expect(team.isPlayerInTeam(player1)).toBeFalsy;
+    expect(team.isPlayerInTeam(player1)).toBe(false);
 
-    expect(team.isPlayerInTeam(player2)).toBeTruthy;
+    expect(team.isPlayerInTeam(player2)).toBe(true);
 
    });
 
@@ -185,8 +185,8 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
     
     team.clearFixedPlayers();
@@ -198,15 +198,15 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addPlayer(player1)).toBeTruthy;
-    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.addPlayer(player1)).toBe(true);
+    expect(team.addSubstitutionPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
     
     team.removePlayer(player2);
     expect(team.currentSize).toEqual(1);
-    expect(team.isPlayerInTeam(player2)).toBeFalsy;
+    expect(team.isPlayerInTeam(player2)).toBe(false);
 
-    expect(team.isPlayerInTeam(player1)).toBeTruthy;
+    expect(team.isPlayerInTeam(player1)).toBe(true);
 
    });
 
@@ -214,8 +214,8 @@ player2.addGameSkill(new GameSkill(game, 5));
     const team: Team = new Team("team-name", 3, game);
     expect(team.currentSize).toEqual(0);
 
-    expect(team.addSubstitutionPlayer(player1)).toBeTruthy;
-    expect(team.addSubstitutionPlayer(player2)).toBeTruthy;
+    expect(team.addSubstitutionPlayer(player1)).toBe(true);
+    expect(team.addSubstitutionPlayer(player2)).toBe(true);
     expect(team.currentSize).toEqual(2);
     
     team.clearSubstitutionPlayers();
