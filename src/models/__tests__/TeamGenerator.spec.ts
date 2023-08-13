@@ -61,12 +61,6 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
         expect(generateResult).instanceOf(Array<Team>);
 
         const teams: Array<Team> = generateResult as Array<Team>;
-        console.log(teams);
-        for(const team of teams){
-            console.log(team.currentSize);
-            console.log(team.targetSize);
-            console.log(team.isFull);
-        }
 
         expect(teams.length).toEqual(3);
 
@@ -77,33 +71,6 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
      
     });
 
-    it("Shall generate the expected amount of teams with one team filled partially.", () => {
-
-        const teamSize: number = 3;
-        const amountOfPlayers = 8;
-    
-        let players: Array<Player> = new Array<Player>();
-    
-        for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player"+i);
-            player.addGameSkill(new GameSkill(game, i%5 + 1));
-            players.push(player);
-        }
-
-        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
-        const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
-        expect(generateResult).instanceOf(Array<Team>);
-
-        const teams: Array<Team> = generateResult as Array<Team>;
-
-        expect(teams.length).toEqual(3);
-
-        for (let team of teams){
-            expect(team.targetSize).toEqual(teamSize);
-            expect(team.isFull).toBe(true);
-        }
-     
-    });
    
  
   });

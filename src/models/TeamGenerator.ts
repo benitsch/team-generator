@@ -220,13 +220,12 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
      * in each iteration.
      * 
      * 
-     * @param orderedPlayerArray The player list which is preferrably ordered by their game skill
+     * @param orderedPlayerArray The player list which is descending ordered by their game skill
      * @param teamSize The size of the teams to be created
      * @param game The game on which the ordering of the incoming player list is based on (needed to calc avg player skill)
      * @returns A tuple containing the created full teams, a non full team if players are left over and the avg player skill
      */
     protected assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
-        //TODO(tg): maybe call orderPlayerDescendingByGameSkill in here to ensure ordering!!!
 
         // Create amount teams that can be fully filled
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
@@ -246,32 +245,39 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
         for (const player of orderedPlayerArray){
 
             playerSkillSum += player.getSkillForGame(game);
+            let additionalTeamHandled: boolean = additionalTeam.currentSize === amountOfRemainingPlayers;
 
             if(forward){ //alternating after each team has an additional player assigned
 
+                // teams that need to get full get first in forward iteration
                 if (teamIndex < fullTeams.length){
                     fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex++;
-                }else{
-                    // additional team gets last in forward iteration if limit allows
-                    if (additionalTeam.currentSize < amountOfRemainingPlayers){
-                        additionalTeam.addPlayer(player);
-                    }
-                    forward = false; // switch to bachwards now
+                }else{ // additional team gets last in forward iteration if limit allows
+                    additionalTeam.addPlayer(player);
+                    additionalTeamHandled = true;
+                }
+                
+                // check if to be swapped to backward assignment mode
+                if(teamIndex === fullTeams.length && additionalTeamHandled){
+                    forward = false; // switch to backwards now
                 }
                 
             }else{ // backwards
 
-                if(teamIndex >= fullTeams.length){
-                    teamIndex = fullTeams.length - 1;
-                    // additional team gets first in backward iteration if limit allows
-                    if(additionalTeam.currentSize < amountOfRemainingPlayers){
-                        additionalTeam.addPlayer(player);
+                // additional team gets first in backward iteration if limit allows
+                if(teamIndex === fullTeams.length && !additionalTeamHandled){
+                    additionalTeam.addPlayer(player);
+                }else { // other teams get after additional team in backwards iteration
+                    if(teamIndex >= fullTeams.length){
+                        teamIndex = fullTeams.length - 1;
                     }
-                }else if(teamIndex >= 0){
                     fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex--;
-                }else{
+                }
+
+                // swap back to forward assignment when back first team 
+                if(teamIndex < 0){
                     teamIndex = 0;
                     forward = true; // switch to forward again
                 }
