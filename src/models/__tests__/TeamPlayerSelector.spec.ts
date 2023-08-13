@@ -30,7 +30,7 @@ class OptimalTeamSelectorUnderTest extends OptimalTeamPlayerSelector {
 }
 
 
-describe("Select Suitable Players Test", () => {
+describe("TeamPlayerSelectorTest", () => {
 
     const game: Game = new Game("HOTS", "MOBA");
 
@@ -85,15 +85,17 @@ describe("Select Suitable Players Test", () => {
         const mockRandomSource: RandomSource = imock();
         let selector: OptimalTeamSelectorUnderTest = new OptimalTeamSelectorUnderTest(instance(mockRandomSource));
         let amountOfPlayersToSelect: number = 3;
-        when(mockRandomSource.getRandomNumber()).thenReturn(0).thenReturn(1).thenReturn(2);
+        when(mockRandomSource.getRandomNumber()).thenReturn(0); // random index removed is always 0 until only requested amount is left
 
         let [randomPlayerSelection, alternativePlayers] = selector.selectRandomPlayers(selectablePlayers, amountOfPlayersToSelect);
+        expect(randomPlayerSelection.length).toEqual(amountOfPlayersToSelect);
 
-        for (let i = 0; i < selectablePlayers.length; i++){
-            if (i <= 2){
-                expect(selectablePlayers.at(i) === randomPlayerSelection.at(i));
+        for (let i = 0, j = 0; i < selectablePlayers.length; i++){
+            if (i < selectablePlayers.length - amountOfPlayersToSelect){
+                expect(selectablePlayers.at(i)).toEqual(alternativePlayers.at(i));
             }else{
-                expect(selectablePlayers.at(i) === alternativePlayers.at(i + randomPlayerSelection.length));
+                expect(selectablePlayers.at(i)).toEqual(randomPlayerSelection.at(j));
+                j++;
             }
         }
      
