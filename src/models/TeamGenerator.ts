@@ -3,7 +3,9 @@ import type Game from "@/models/Game";
 import GameSkill from "@/models/GameSkill";
 import Player from "@/models/Player";
 import Team from "@/models/Team";
-import {ContainerUtils} from "@/models/ContainerUtils";
+import ContainerUtils from "@/models/ContainerUtils";
+import RandomSource from "@/models/RandomSource";
+import DefaultRandomSource from "@/models/RandomSource";
 
 /** This error code is used to determine different invalid input constellations */
 export enum GeneratorErrorCode {
@@ -36,6 +38,14 @@ export default interface TeamGenerator {
    * It has one public static interface "generate" separated into several protected substeps.
    */
 export default class BalancedRandomTeamGenerator implements TeamGenerator {
+
+    /**
+     * Constructor that optionally takes a random source interface as argument.
+     * DefaultRandomSource is the default interface implementaion taken.
+     * 
+     * @param randomSource The random source to be injected for random team generation.
+     */
+    constructor (private randomSource: RandomSource = new DefaultRandomSource()){}
 
     /**
      * Generates a set of randomly assembled but balanced teams out of a set of given players and specified team size for a given game.
@@ -365,7 +375,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         //Step 4: If any swap possibilities, pick one randomly and return true, if not return false
         if (potentialSwapPairs.length > 0){
-            let randomIndex: number = Math.floor(Math.random() * (potentialSwapPairs.length - 1));
+            let randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (potentialSwapPairs.length - 1));
             let [swapPlayerHigh, swapPlayerLow] = potentialSwapPairs[randomIndex];
             higherTeam.removePlayer(swapPlayerHigh);
             lowerTeam.removePlayer(swapPlayerLow);

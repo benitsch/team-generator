@@ -1,5 +1,7 @@
 import Player from "@/models/Player";
 import Team from "@/models/Team";
+import RandomSource from "@/models/RandomSource";
+import DefaultRandomSource from "@/models/RandomSource";
 
 /** This error code is used to determine different invalid input constellations */
 export enum SelectorErrorCode {
@@ -37,6 +39,13 @@ export default interface TeamPlayerSelector {
 
 export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
+    /**
+     * Constructor that optionally takes a random source interface as argument.
+     * DefaultRandomSource is the default interface implementaion taken.
+     * 
+     * @param randomSource The random source to be injected for randomized optimal team player selection.
+     */
+    constructor (private randomSource: RandomSource = new DefaultRandomSource()){}
 
     /**
      * Generates a set of randomly selected players to complement a team optimized to a given skill range.
@@ -146,7 +155,7 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
         let remainingPlayers: Array<Player> = new Array<Player>();
 
         while (playersToRemove > 0){
-            let randomIndex: number = Math.floor(Math.random() * (randomPlayers.length - 1));
+            let randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (randomPlayers.length - 1));
             let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0);
             if (removedPlayer !== undefined){
                 remainingPlayers.push(removedPlayer);

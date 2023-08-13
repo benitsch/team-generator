@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import {ContainerUtils} from "../ContainerUtils";
+import ContainerUtils from "../ContainerUtils";
 
 describe("Array Shuffle Tests", () => {
 

@@ -6,7 +6,7 @@ import GameSkill from "../GameSkill";
 import Game from "../Game";
 import TeamGenerator from "../TeamGenerator";
 import BalancedRandomTeamGenerator from "../TeamGenerator";
-import {GeneratorErrorCode } from "../TeamGenerator";
+import { GeneratorErrorCode } from "../TeamGenerator";
 
 describe("Generate Team Test", () => {
 
