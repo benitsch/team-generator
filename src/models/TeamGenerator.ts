@@ -236,7 +236,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         // Create additional team for potential remaining players
         const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
-        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize, game); // stays empty if no remaining players
+        let additionalTeam: Team =  new Team("Team" + (amountOfFullTeams + 1), teamSize, game); // stays empty if no remaining players
 
         // Alternate between forward and backward looping over teams and add one player of ordered list at a time
         let teamIndex: number = 0;
