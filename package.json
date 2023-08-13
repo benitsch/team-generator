@@ -22,6 +22,7 @@
     "vuetify": "^3.1.12"
   },
   "devDependencies": {
+    "@johanblumenberg/ts-mockito": "^1.0.38",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/jsdom": "^21.1.1",
     "@types/node": "^18.15.11",
