@@ -125,6 +125,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         //Step 4: Refine team balance (swap players between best and worst team if possible)
         // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
+        // add additional team only if it holds remaining fixed players.
         if (additionalTeam.fixedPlayers.length > 0){
             for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
                 let player: Player = new Player("FakeSubPlayer" + i);
