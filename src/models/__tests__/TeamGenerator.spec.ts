@@ -41,6 +41,7 @@ class BalancedRandomTeamGeneratorUnderTest extends BalancedRandomTeamGenerator {
 describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     const game: Game = new Game("HOTS", "MOBA");
+    let generator: TeamGenerator = new BalancedRandomTeamGenerator();
 
 
     it("Shall generate the expected amount of full teams.", () => {
@@ -56,7 +57,6 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
             players.push(player);
         }
 
-        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
         const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
         expect(generateResult).instanceOf(Array<Team>);
 
@@ -84,7 +84,6 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
             players.push(player);
         }
 
-        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
         const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
         expect(generateResult).instanceOf(Array<Team>);
 
@@ -118,7 +117,6 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
             players.push(player);
         }
 
-        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
         const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
         expect(generateResult).instanceOf(Array<Team>);
 
