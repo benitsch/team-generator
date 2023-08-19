@@ -159,6 +159,33 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
      
     });
 
+    it("Shall not accept dupicates in selectable player list.", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let duplicatePlayerList: Array<Player> = new Array<Player>();
+
+        for (let i = 0; i < 10; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
+            duplicatePlayerList.push(player);
+        }
+
+        let duplicatePlayer: Player = new Player("DuplicatePlayer");
+        duplicatePlayer.addGameSkill(new GameSkill(game, 3));
+        duplicatePlayerList.push(duplicatePlayer);
+        duplicatePlayerList.push(duplicatePlayer);
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(duplicatePlayerList, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.PlayerListContainsDuplicates);
+        
+     
+    });
+
 
     it("Shall ensure that random player selection part is based on a random source.", () => {
 
