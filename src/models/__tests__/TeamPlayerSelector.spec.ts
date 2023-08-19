@@ -48,56 +48,6 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
     }
 
     let selector: TeamPlayerSelector = new OptimalTeamPlayerSelector();
-
-    it("Shall not accept negative team skill range", () => {
-
-        const minTeamSkill: number = -10;
-        const maxTeamSkill: number = 10;
-    
-        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
-        expect(selectResult).toBeTypeOf("number");
-
-        const errorCode: SelectorErrorCode = selectResult as SelectorErrorCode;
-        expect(errorCode).toEqual(SelectorErrorCode.TeamSkillRangeNegative);
-        
-     
-    });
-
-    it("Shall not accept min skill exceeding max skill", () => {
-
-        const minTeamSkill: number = 20;
-        const maxTeamSkill: number = 10;
-    
-        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
-        expect(selectResult).toBeTypeOf("number");
-
-        const errorCode: SelectorErrorCode = selectResult as SelectorErrorCode;
-        expect(errorCode).toEqual(SelectorErrorCode.MinTeamSkillExceedsMax);
-        
-     
-    });
-
-    it("Shall not accept selecting players if team is already full!", () => {
-
-        const minTeamSkill: number = 10;
-        const maxTeamSkill: number = 20;
-
-        let fullTeam: Team = new Team("NoSpaceLeft", 5, game);
-
-        for (let i = fullTeam.allPlayers.length; i < fullTeam.targetSize; i++){ //fill up team
-            let player: Player = new Player("Player" + i);
-            player.addGameSkill(new GameSkill(game, 3));
-            fullTeam.addPlayer(player);
-        }
-    
-        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, fullTeam, minTeamSkill, maxTeamSkill);
-        expect(selectResult).toBeTypeOf("number");
-
-        const errorCode: SelectorErrorCode = selectResult as SelectorErrorCode;
-        expect(errorCode).toEqual(SelectorErrorCode.TeamAlreadyFull);
-        
-     
-    });
     
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
@@ -135,19 +85,68 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
     let team: Team = new Team("HotOnes", 5, game);
     team.addPlayer(lonePlayer);
 
+    let selectablePlayers: Array<Player> = new Array<Player>();
+    for (let i = 0; i < 10; i++){
+        let player: Player = new Player("Player" + i);
+        player.addGameSkill(new GameSkill(game, (i % 5) + 1));
+        selectablePlayers.push(player);
+    }
+
     const mockRandomSource: RandomSource = imock();
     let selector: OptimalTeamSelectorUnderTest = new OptimalTeamSelectorUnderTest(instance(mockRandomSource));
 
+    it("Shall not accept negative team skill range", () => {
+
+        const minTeamSkill: number = -10;
+        const maxTeamSkill: number = 10;
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.TeamSkillRangeNegative);
+        
+     
+    });
+
+    it("Shall not accept min skill exceeding max skill", () => {
+
+        const minTeamSkill: number = 20;
+        const maxTeamSkill: number = 10;
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.MinTeamSkillExceedsMax);
+        
+     
+    });
+
+    it("Shall not accept selecting players if team is already full!", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let fullTeam: Team = new Team("NoSpaceLeft", 5, game);
+
+        for (let i = fullTeam.allPlayers.length; i < fullTeam.targetSize; i++){ //fill up team
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            fullTeam.addPlayer(player);
+        }
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayers, fullTeam, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.TeamAlreadyFull);
+        
+     
+    });
+
 
     it("Shall ensure that random player selection part is based on a random source.", () => {
-
-        let selectablePlayers: Array<Player> = new Array<Player>();
-        for (let i = 0; i < 10; i++){
-            let player: Player = new Player("Player" + i);
-            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
-            selectablePlayers.push(player);
-        }
-
 
         let amountOfPlayersToSelect: number = 3;
         when(mockRandomSource.getRandomNumber()).thenReturn(0); // random index removed is always 0 until only requested amount is left
