@@ -159,7 +159,7 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
      
     });
 
-    it("Shall not accept dupicates in selectable player list.", () => {
+    it("Shall not accept duplicates in selectable player list.", () => {
 
         const minTeamSkill: number = 10;
         const maxTeamSkill: number = 20;
@@ -182,6 +182,31 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
 
         const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
         expect(errorCode).toEqual(SelectorErrorCode.PlayerListContainsDuplicates);
+        
+     
+    });
+
+    it("Shall not accept that selectable player list contains team members.", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let selectablePlayerListWithTeamMembers: Array<Player> = new Array<Player>();
+
+        for (let i = 0; i < 10; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
+            selectablePlayerListWithTeamMembers.push(player);
+        }
+
+        selectablePlayerListWithTeamMembers.push(lonePlayer); // this player is already on the team
+
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayerListWithTeamMembers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.PlayerListContainsTeamMembers);
         
      
     });
