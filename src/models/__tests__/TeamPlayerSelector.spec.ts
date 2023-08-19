@@ -16,8 +16,8 @@ class OptimalTeamSelectorUnderTest extends OptimalTeamPlayerSelector {
         super(randomSource);
     }
 
-    public validateSelectorInput(players: Player[], team: Team): SelectorErrorCode | undefined {
-        return super.validateSelectorInput(players, team);
+    public validateSelectorInput(players: Player[], team: Team, minTeamSkill: number, maxTeamSkill: number): SelectorErrorCode | undefined {
+        return super.validateSelectorInput(players, team, minTeamSkill, maxTeamSkill);
     }
     
     public selectRandomPlayers(players: Player[], amount: number): [Player[], Player[]] {
