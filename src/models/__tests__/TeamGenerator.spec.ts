@@ -150,10 +150,87 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
     const generator: BalancedRandomTeamGeneratorUnderTest = new BalancedRandomTeamGeneratorUnderTest(instance(mockRandomSource));
 
 
-    it("Shall generate the expected amount of teams of expected target size.", () => {
+    it("Shall not accept duplicate players at input validation.", () => {
 
-        //TODO(tg): add tests for subroutines of generator
-        expect(true).toEqual(true);
+        const teamSize: number = 3;
+        const amountOfPlayers = 9;
+    
+        let players: Array<Player> = new Array<Player>();
+        let player: Player = new Player("PlayerOne");
+        player.addGameSkill(new GameSkill(game, 3));
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            players.push(player);
+        }
+
+        const generateResult: GeneratorErrorCode | undefined= generator.validateGeneratorInput(players, teamSize, game);
+        expect(generateResult).toBeTypeOf("number");
+        
+        const errorCode: GeneratorErrorCode = generateResult as GeneratorErrorCode;
+        expect(errorCode).toEqual(GeneratorErrorCode.PlayerListContainsDuplicates);
+     
+    });
+
+    it("Shall not accept too few players at input validation (at least two teams must be creatable!).", () => {
+
+        const teamSize: number = 3;
+        const amountOfPlayers = 5;
+    
+        let players: Array<Player> = new Array<Player>();
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            players.push(player);
+        }
+
+        const generateResult: GeneratorErrorCode | undefined = generator.validateGeneratorInput(players, teamSize, game);
+        expect(generateResult).toBeTypeOf("number");
+        
+        const errorCode: GeneratorErrorCode = generateResult as GeneratorErrorCode;
+        expect(errorCode).toEqual(GeneratorErrorCode.TeamSizeAndPlayerLengthMismatch);
+     
+    });
+
+    it("Shall not accept players with no game assessment at input validation.", () => {
+
+        const teamSize: number = 3;
+        const amountOfPlayers = 8;
+    
+        let players: Array<Player> = new Array<Player>();
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            players.push(player);
+        }
+
+        players.push(new Player("NoSkill"));
+
+        const generateResult: GeneratorErrorCode | undefined = generator.validateGeneratorInput(players, teamSize, game);
+        expect(generateResult).toBeTypeOf("number");
+        
+        const errorCode: GeneratorErrorCode = generateResult as GeneratorErrorCode;
+        expect(errorCode).toEqual(GeneratorErrorCode.PlayerSkillsIncomplete);
+     
+    });
+
+    it("Shall accept valid input players enough to build at least two teams.", () => {
+
+        const teamSize: number = 3;
+        const amountOfPlayers = 6;
+    
+        let players: Array<Player> = new Array<Player>();
+    
+        for(let i = 0; i < amountOfPlayers; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            players.push(player);
+        }
+
+        const generateResult: GeneratorErrorCode | undefined = generator.validateGeneratorInput(players, teamSize, game);
+        expect(generateResult).toBeTypeOf("undefined"); //SUCCESS
+        
      
     });
    
