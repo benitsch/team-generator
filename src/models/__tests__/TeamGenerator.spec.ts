@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { imock, instance } from "@johanblumenberg/ts-mockito";
+import { imock, instance, when, thenReturn } from "@johanblumenberg/ts-mockito";
 
 import Team from "../Team";
 import Player from "../Player";
@@ -244,6 +244,114 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
         
      
     });
+
+
+    it("Shall not swap players between 2 teams if skill diff is less or equal to 1", () => {
+
+        const teamSize: number = 3;
+
+        let team1: Team = new Team("Team1", teamSize, game);
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerA" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            team1.addPlayer(player);
+        }
+
+        let team2: Team = new Team("Team2", teamSize, game);
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerB" + i);
+            if(i === 0){
+                player.addGameSkill(new GameSkill(game, 4)); // to create team skill diff of 1
+            }else{
+                player.addGameSkill(new GameSkill(game, 3));
+            }
+            team2.addPlayer(player);
+        }
+    
+
+
+        const swapSuccess: boolean = generator.trySwapPlayerForBetterBalance(team1, team2);
+        expect(swapSuccess).toEqual(false);
+     
+    });
+
+
+    it("Shall not swap players if team diff is higher than 1 but diff cannot be reduced.", () => {
+
+        const teamSize: number = 2;
+
+        let team1: Team = new Team("Team1", teamSize, game);
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerA" + i);
+            player.addGameSkill(new GameSkill(game, 2));
+            team1.addPlayer(player);
+        }
+
+        let team2: Team = new Team("Team2", teamSize, game);
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerB" + i);
+            if( i === 0){
+                player.addGameSkill(new GameSkill(game, 4)); // team 2 has one high skill player
+            }else{
+                player.addGameSkill(new GameSkill(game, 2));
+            }
+            team2.addPlayer(player);
+        }
+    
+        const swapSuccess: boolean = generator.trySwapPlayerForBetterBalance(team1, team2);
+        expect(swapSuccess).toEqual(false);
+     
+    });
+
+    it("Shall swap players if team diff is higher than 1 and diff can be reduced.", () => {
+
+        const teamSize: number = 2;
+
+        let team1: Team = new Team("Team1", teamSize, game); //low skill team
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerA" + i);
+            player.addGameSkill(new GameSkill(game, 2));
+            team1.addPlayer(player);
+        }
+
+        let team2: Team = new Team("Team2", teamSize, game); //high skill team
+        for(let i = 0; i < teamSize; i++){
+            let player: Player = new Player("PlayerB" + i);
+            player.addGameSkill(new GameSkill(game, 4));
+            team2.addPlayer(player);
+        }
+
+        when(mockRandomSource.getRandomNumber()).thenReturn(0); // mock forces first swap possibility to be taken
+        const swapSuccess: boolean = generator.trySwapPlayerForBetterBalance(team1, team2);
+        expect(swapSuccess).toEqual(true);
+
+        expect(team1.getTeamGameSkill()).toEqual(team2.getTeamGameSkill());
+
+        for(let i = 0; i < team1.fixedPlayers.length; i++){
+            if ( i == team1.fixedPlayers.length - 1){
+                expect(team1.fixedPlayers.at(i)?.tag).toEqual("PlayerB0");
+                expect(team1.fixedPlayers.at(i)?.getSkillForGame(game)).toEqual(4);
+            }else{
+                expect(team1.fixedPlayers.at(i)?.tag).toContain("PlayerA");
+                expect(team1.fixedPlayers.at(i)?.getSkillForGame(game)).toEqual(2);
+            }
+        }
+
+
+        for(let i = 0; i < team2.fixedPlayers.length; i++){
+            if ( i == team2.fixedPlayers.length - 1){
+                expect(team2.fixedPlayers.at(i)?.tag).toEqual("PlayerA0");
+                expect(team2.fixedPlayers.at(i)?.getSkillForGame(game)).toEqual(2);
+            }else{
+                expect(team2.fixedPlayers.at(i)?.tag).toContain("PlayerB");
+                expect(team2.fixedPlayers.at(i)?.getSkillForGame(game)).toEqual(4);
+            }
+        }
+     
+    });
+
+
+
    
  
   });
