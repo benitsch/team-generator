@@ -30,7 +30,7 @@ class OptimalTeamSelectorUnderTest extends OptimalTeamPlayerSelector {
 }
 
 
-describe("TeamPlayerSelectorTest", () => {
+describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
 
     const game: Game = new Game("HOTS", "MOBA");
 
@@ -40,7 +40,7 @@ describe("TeamPlayerSelectorTest", () => {
     let team: Team = new Team("HotOnes", 5, game);
     team.addPlayer(lonePlayer);
 
-    let selector: TeamPlayerSelector = new OptimalTeamSelectorUnderTest();
+    let selector: TeamPlayerSelector = new OptimalTeamPlayerSelector();
 
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
@@ -68,10 +68,27 @@ describe("TeamPlayerSelectorTest", () => {
             totalTeamSkill += player.getSkillForGame(game);
         }
 
-        expect(totalTeamSkill >= minTeamSkill);
-        expect(totalTeamSkill <= maxTeamSkill);
+        expect(totalTeamSkill).toBeGreaterThanOrEqual(minTeamSkill);
+        expect(totalTeamSkill).toBeLessThanOrEqual(maxTeamSkill);
      
     });
+   
+ 
+  });
+
+  describe("OptimalTeamPlayerSelectorClassTest", () => {
+
+    const game: Game = new Game("HOTS", "MOBA");
+
+    let lonePlayer: Player = new Player("TheLoneWolf", "Jon", "Doe");
+    lonePlayer.addGameSkill(new GameSkill(game, 3));
+
+    let team: Team = new Team("HotOnes", 5, game);
+    team.addPlayer(lonePlayer);
+
+    const mockRandomSource: RandomSource = imock();
+    let selector: OptimalTeamSelectorUnderTest = new OptimalTeamSelectorUnderTest(instance(mockRandomSource));
+
 
     it("Shall ensure that random player selection part is based on a random source.", () => {
 
@@ -82,8 +99,7 @@ describe("TeamPlayerSelectorTest", () => {
             selectablePlayers.push(player);
         }
 
-        const mockRandomSource: RandomSource = imock();
-        let selector: OptimalTeamSelectorUnderTest = new OptimalTeamSelectorUnderTest(instance(mockRandomSource));
+
         let amountOfPlayersToSelect: number = 3;
         when(mockRandomSource.getRandomNumber()).thenReturn(0); // random index removed is always 0 until only requested amount is left
 

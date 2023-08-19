@@ -50,7 +50,8 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     /**
      * Generates a set of randomly assembled but balanced teams out of a set of given players and specified team size for a given game.
      * The amount of teams returned depends on the amount of players and team size: (players.length / teamSize) + 1 if(players.length % teamSize)
-     * 
+     * Thr returned array of teams will be shuffled so it can be used to already setup matches between teams.
+     *
      * E.g.
      * Player skills: [5, 9, 4, 7, 10, 4, 3, 6, 4]
      * Team size: 3
@@ -101,11 +102,10 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
      * 
      * 
      * 
-     * 
      * @param players The players to create the teams from (players.length must be >= 2* teamSize)
      * @param teamSize  The target size of the teams (if not a multiple of players.length then some teams might not be full, at most (teamSize - 1) teams)
      * @param game The game on which the balancing will be based (all players must be assessed with a skill >= 0 for this game)
-     * @returns A set of randomly assembled but balanced teams.
+     * @returns A set of randomly assembled but balanced teams (where one team might not be full depending on the amount of given players and team size).
      */
     public generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode{
 
@@ -120,25 +120,21 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         
         //Step 3: create X full teams and one additional team with remaining players if any
-        let [fullTeams, additionalTeam, avgPlayerSkill] = this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
+        let [fullTeams, additionalTeam] = this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
         
 
         //Step 4: Refine team balance (swap players between best and worst team if possible)
         // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
-        if (additionalTeam.fixedPlayers.length > 0){
-            for(let i = additionalTeam.currentSize; i < additionalTeam.targetSize; i++){
-                let player: Player = new Player("FakeSubPlayer" + i);
-                player.addGameSkill(new GameSkill(game, avgPlayerSkill));
-            }
-            fullTeams.push(additionalTeam); // add team with sub players to collection for balance optimizations
-        }
-
-        // optimize balance between teams
+        // add additional team only if it holds remaining fixed players.
         this.optimizeTeamSkillBalance(fullTeams);
 
-        // remove fake sub players again from additional team:
-        additionalTeam.clearSubstitutionPlayers();
+        //Step 5: Add additional team if it holds any players (this is the team that would need additional players to fill up)
+        if (additionalTeam.fixedPlayers.length > 0){
+            fullTeams.push(additionalTeam);
+        }
 
+        // shuffle order of teams (useful for opponent setup: 1. vs 2., 3. vs 4., ....)
+        ContainerUtils.shuffleArray(fullTeams);
         return fullTeams;
     }
 
@@ -207,12 +203,11 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
     /**
      * This function takes a list of players (ideally ordered by their game skill for balance reasons), the 
-     * requested team size and the game for which the players shall be teamed up. The result consists of 3
+     * requested team size and the game for which the players shall be teamed up. The result consists of 2
      * elements:
      * 1) An array of teams which are filled up to the requested team size
      * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
      *    But this extra team was also involved in balancing so it does not containt best or worst players only.
-     * 3) The average player skill for the given game.
      * 
      * If the given player list is not ordered by the players game skill this function will still return the
      * mentioned results but balancing is not guaranteed. Balancing is achieved by assigning one player after
@@ -220,13 +215,12 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
      * in each iteration.
      * 
      * 
-     * @param orderedPlayerArray The player list which is preferrably ordered by their game skill
+     * @param orderedPlayerArray The player list which is descending ordered by their game skill
      * @param teamSize The size of the teams to be created
      * @param game The game on which the ordering of the incoming player list is based on (needed to calc avg player skill)
-     * @returns A tuple containing the created full teams, a non full team if players are left over and the avg player skill
+     * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
      */
-    protected assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team, number] {
-        //TODO(tg): maybe call orderPlayerDescendingByGameSkill in here to ensure ordering!!!
+    protected assignPlayersToTeams(orderedPlayerArray: Array<Player>, teamSize: number, game:Game): [Array<Team>, Team] {
 
         // Create amount teams that can be fully filled
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
@@ -237,49 +231,53 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         // Create additional team for potential remaining players
         const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
-        let additionalTeam: Team =  new Team("Team" + amountOfFullTeams + 1, teamSize, game); // stays empty if no remaining players
+        let additionalTeam: Team =  new Team("Team" + (amountOfFullTeams + 1), teamSize, game); // stays empty if no remaining players
 
         // Alternate between forward and backward looping over teams and add one player of ordered list at a time
         let teamIndex: number = 0;
         let forward: boolean = true;
-        let playerSkillSum: number = 0;
         for (const player of orderedPlayerArray){
 
-            playerSkillSum += player.getSkillForGame(game);
+            let additionalTeamHandled: boolean = additionalTeam.currentSize === amountOfRemainingPlayers;
 
             if(forward){ //alternating after each team has an additional player assigned
 
+                // teams that need to get full get first in forward iteration
                 if (teamIndex < fullTeams.length){
                     fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex++;
-                }else{
-                    // additional team gets last in forward iteration if limit allows
-                    if (additionalTeam.currentSize < amountOfRemainingPlayers){
-                        additionalTeam.addPlayer(player);
-                    }
-                    forward = false; // switch to bachwards now
+                }else{ // additional team gets last in forward iteration if limit allows
+                    additionalTeam.addPlayer(player);
+                    additionalTeamHandled = true;
+                }
+                
+                // check if to be swapped to backward assignment mode
+                if(teamIndex === fullTeams.length && additionalTeamHandled){
+                    forward = false; // switch to backwards now
                 }
                 
             }else{ // backwards
 
-                if(teamIndex >= fullTeams.length){
-                    teamIndex = fullTeams.length - 1;
-                    // additional team gets first in backward iteration if limit allows
-                    if(additionalTeam.currentSize < amountOfRemainingPlayers){
-                        additionalTeam.addPlayer(player);
+                // additional team gets first in backward iteration if limit allows
+                if(teamIndex === fullTeams.length && !additionalTeamHandled){
+                    additionalTeam.addPlayer(player);
+                }else { // other teams get after additional team in backwards iteration
+                    if(teamIndex >= fullTeams.length){
+                        teamIndex = fullTeams.length - 1;
                     }
-                }else if(teamIndex >= 0){
                     fullTeams.at(teamIndex)?.addPlayer(player);
                     teamIndex--;
-                }else{
+                }
+
+                // swap back to forward assignment when back first team 
+                if(teamIndex < 0){
                     teamIndex = 0;
                     forward = true; // switch to forward again
                 }
             }
         }
 
-        const avgPlayerSkill: number = Math.round(playerSkillSum / orderedPlayerArray.length);
-        return [fullTeams, additionalTeam, avgPlayerSkill];
+        return [fullTeams, additionalTeam];
     }
 
     /**

@@ -38,7 +38,7 @@ export default class Team {
     }
 
     get isFull(): boolean {
-        return this.currentSize == this.targetSize;
+        return this.currentSize === this.targetSize;
     }
 
     get game(): Game {
