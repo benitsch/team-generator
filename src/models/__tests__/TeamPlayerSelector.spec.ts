@@ -76,6 +76,28 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
         
      
     });
+
+    it("Shall not accept selecting players if team is already full!", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let fullTeam: Team = new Team("NoSpaceLeft", 5, game);
+
+        for (let i = fullTeam.allPlayers.length; i < fullTeam.targetSize; i++){ //fill up team
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, 3));
+            fullTeam.addPlayer(player);
+        }
+    
+        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, fullTeam, minTeamSkill, maxTeamSkill);
+        expect(selectResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = selectResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.TeamAlreadyFull);
+        
+     
+    });
     
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
