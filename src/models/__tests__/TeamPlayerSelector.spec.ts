@@ -62,6 +62,20 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
         
      
     });
+
+    it("Shall not accept min skill exceeding max skill", () => {
+
+        const minTeamSkill: number = 20;
+        const maxTeamSkill: number = 10;
+    
+        const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
+        expect(selectResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = selectResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.MinTeamSkillExceedsMax);
+        
+     
+    });
     
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
