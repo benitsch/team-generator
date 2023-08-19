@@ -40,16 +40,16 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
     let team: Team = new Team("HotOnes", 5, game);
     team.addPlayer(lonePlayer);
 
+    let selectablePlayers: Array<Player> = new Array<Player>();
+    for (let i = 0; i < 10; i++){
+        let player: Player = new Player("Player" + i);
+        player.addGameSkill(new GameSkill(game, (i % 5) + 1));
+        selectablePlayers.push(player);
+    }
+
     let selector: TeamPlayerSelector = new OptimalTeamPlayerSelector();
 
     it("Shall not accept negative team skill range", () => {
-
-        let selectablePlayers: Array<Player> = new Array<Player>();
-        for (let i = 0; i < 10; i++){
-            let player: Player = new Player("Player" + i);
-            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
-            selectablePlayers.push(player);
-        }
 
         const minTeamSkill: number = -10;
         const maxTeamSkill: number = 10;
@@ -66,18 +66,10 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
 
-        let selectablePlayers: Array<Player> = new Array<Player>();
-        for (let i = 0; i < 10; i++){
-            let player: Player = new Player("Player" + i);
-            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
-            selectablePlayers.push(player);
-        }
-
         const minTeamSkill: number = 10;
         const maxTeamSkill: number = 20;
     
         const selectResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(selectablePlayers, team, minTeamSkill, maxTeamSkill);
-        console.log("RESULT CODE = " + selectResult);
         expect(selectResult).instanceOf(Array<Player>);
 
         const selectedPlayers: Array<Player> = selectResult as Array<Player>;
