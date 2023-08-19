@@ -44,6 +44,19 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
     let generator: TeamGenerator = new BalancedRandomTeamGenerator();
 
 
+    it("Shall not accept invalid input.", () => {
+
+        const teamSize: number = 3;
+    
+        let players: Array<Player> = new Array<Player>(); // empty player list
+    
+        const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
+        expect(generateResult).toBeTypeOf("number"); // error code
+
+     
+    });
+
+
     it("Shall generate the expected amount of full teams.", () => {
 
         const teamSize: number = 3;
