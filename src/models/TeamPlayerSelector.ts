@@ -1,5 +1,7 @@
 import Player from "@/models/Player";
 import Team from "@/models/Team";
+import RandomSource from "@/models/RandomSource";
+import DefaultRandomSource from "@/models/RandomSource";
 
 /** This error code is used to determine different invalid input constellations */
 export enum SelectorErrorCode {
@@ -12,13 +14,38 @@ export enum SelectorErrorCode {
     TeamSkillRangeNegative
 }
 
+/**
+ * Team player selector interface.
+ */
 export default interface TeamPlayerSelector {
 
+    /**
+     * Selects players to fill up a team for a specific game within a given skill range.
+     * At least the missing amount of players in the team must be covered with the given player selection
+     * and all players must be skill assessed for the team's game. The function will return a selection of 
+     * players which aim to keep the team's skill between a given min and max. If this cannot be achieved
+     * the function shall return a player selection as close as possible to the given range.
+     * 
+     * 
+     * @param players The players to select from.
+     * @param team The team to fill up with players.
+     * @param minTeamSkill The mininum skill the team shall have.
+     * @param maxTeamSkill The maximum skill the team shall have.
+     * 
+     * @returns a player selection for the team or an error code.
+     */
     public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode;
 }
 
-export default class OptimalTeamPlayerSelector {
+export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
+    /**
+     * Constructor that optionally takes a random source interface as argument.
+     * DefaultRandomSource is the default interface implementaion taken.
+     * 
+     * @param randomSource The random source to be injected for randomized optimal team player selection.
+     */
+    constructor (private randomSource: RandomSource = new DefaultRandomSource()){}
 
     /**
      * Generates a set of randomly selected players to complement a team optimized to a given skill range.
@@ -128,7 +155,7 @@ export default class OptimalTeamPlayerSelector {
         let remainingPlayers: Array<Player> = new Array<Player>();
 
         while (playersToRemove > 0){
-            let randomIndex: number = Math.floor(Math.random() * (randomPlayers.length - 1));
+            let randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (randomPlayers.length - 1));
             let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0);
             if (removedPlayer !== undefined){
                 remainingPlayers.push(removedPlayer);

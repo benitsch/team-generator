@@ -5,7 +5,8 @@ import Player from "../Player";
 import GameSkill from "../GameSkill";
 import Game from "../Game";
 import TeamGenerator from "../TeamGenerator";
-import {GeneratorErrorCode } from "../TeamGenerator";
+import BalancedRandomTeamGenerator from "../TeamGenerator";
+import { GeneratorErrorCode } from "../TeamGenerator";
 
 describe("Generate Team Test", () => {
 
@@ -24,7 +25,9 @@ describe("Generate Team Test", () => {
             player.addGameSkill(new GameSkill(game, i%5 + 1));
             players.push(player);
         }
-        const generateResult: Array<Team> | GeneratorErrorCode = TeamGenerator.generate(players, teamSize, game);
+
+        let generator: TeamGenerator = new BalancedRandomTeamGenerator();
+        const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
         expect(generateResult).instanceOf(Array<Team>);
 
         const teams: Array<Team> = generateResult as Array<Team>;

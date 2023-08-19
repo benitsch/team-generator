@@ -1,4 +1,4 @@
-export class ContainerUtils {
+export default class ContainerUtils {
 
  static shuffleArray(array: Array<any>): void {
     array.sort(() => Math.random() - 0.5);
