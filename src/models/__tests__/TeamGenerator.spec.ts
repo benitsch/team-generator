@@ -104,7 +104,7 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
      
     });
 
-    it("Shall generate the expected amount teams with one team that has only one player.", () => {
+    it("Shall generate the expected amount of teams with one team that has only one player.", () => {
 
         const teamSize: number = 3;
         const amountOfPlayers = 7; // one team will have only 1 player
