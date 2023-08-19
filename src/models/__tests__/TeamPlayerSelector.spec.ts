@@ -48,6 +48,20 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
     }
 
     let selector: TeamPlayerSelector = new OptimalTeamPlayerSelector();
+
+    it("Shall not accept empty selectable player list", () => {
+
+        const minTeamSkill: number = -10;
+        const maxTeamSkill: number = 10;
+    
+        const selectorResult: Array<Player> | SelectorErrorCode = selector.selectPlayers(new Array<Player>(), team, minTeamSkill, maxTeamSkill);
+        expect(selectorResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = selectorResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.TeamSkillRangeNegative);
+        
+     
+    });
     
 
     it("Shall select exact missing amount of players within given skill range if possible.", () => {
