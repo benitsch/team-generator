@@ -289,6 +289,114 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
         }
      
     });
+
+    it("Shall not optimize player selection if current selection within given range.", () => {
+
+        const minTeamSkill: number = 7;
+        const maxTeamSkill: number = 9;
+
+        let currentPlayerSelection: Array<Player> = new Array<Player>();
+        let currentSelectedPlayer: Player = new Player("ChosenOne");
+        currentSelectedPlayer.addGameSkill(new GameSkill(game, 3));
+        currentPlayerSelection.push(currentSelectedPlayer);
+
+        let alternativePlayerSelection: Array<Player> = new Array<Player>();
+        let alternativePlayer: Player = new Player("AnotherInterestingChoice");
+        alternativePlayer.addGameSkill(new GameSkill(game, 3));
+        alternativePlayerSelection.push(alternativePlayer);
+
+        let teamToSelectPlayersFor: Team = new Team("NotFullTeam", 2, game);
+        let playerOnTeam: Player = new Player("FirstOne");
+        playerOnTeam.addGameSkill(new GameSkill(game, 5));
+        expect(teamToSelectPlayersFor.addPlayer(playerOnTeam)).toEqual(true);
+    
+        const optimizedSelection: Array<Player> = selector.optimizePlayerSelectionOutOfRange(currentPlayerSelection, alternativePlayerSelection, teamToSelectPlayersFor, minTeamSkill, maxTeamSkill);
+        expect(optimizedSelection.length).toEqual(teamToSelectPlayersFor.targetSize - teamToSelectPlayersFor.currentSize);
+        expect(optimizedSelection).toEqual(currentPlayerSelection); // no changes to current selection expected.
+     
+    });
+
+    it("Shall select player from alternative if team skill exceeds max with current selection.", () => {
+
+        const minTeamSkill: number = 7;
+        const maxTeamSkill: number = 9;
+
+        let currentPlayerSelection: Array<Player> = new Array<Player>();
+        let currentSelectedPlayer: Player = new Player("ChosenOne");
+        currentSelectedPlayer.addGameSkill(new GameSkill(game, 5)); // current selected puts team out of range
+        currentPlayerSelection.push(currentSelectedPlayer);
+
+        let alternativePlayerSelection: Array<Player> = new Array<Player>();
+        let alternativePlayer: Player = new Player("AnotherInterestingChoice");
+        alternativePlayer.addGameSkill(new GameSkill(game, 3));
+        alternativePlayerSelection.push(alternativePlayer);
+
+        let teamToSelectPlayersFor: Team = new Team("NotFullTeam", 2, game);
+        let playerOnTeam: Player = new Player("FirstOne");
+        playerOnTeam.addGameSkill(new GameSkill(game, 5));
+        expect(teamToSelectPlayersFor.addPlayer(playerOnTeam)).toEqual(true);
+    
+        const optimizedSelection: Array<Player> = selector.optimizePlayerSelectionOutOfRange(currentPlayerSelection, alternativePlayerSelection, teamToSelectPlayersFor, minTeamSkill, maxTeamSkill);
+        expect(optimizedSelection.length).toEqual(teamToSelectPlayersFor.targetSize - teamToSelectPlayersFor.currentSize);
+        expect(optimizedSelection).toContain(alternativePlayer); // alternative player selected
+     
+    });
+
+    it("Shall select player from alternative if team skill is below min with current selection.", () => {
+
+        const minTeamSkill: number = 7;
+        const maxTeamSkill: number = 9;
+
+        let currentPlayerSelection: Array<Player> = new Array<Player>();
+        let currentSelectedPlayer: Player = new Player("ChosenOne");
+        currentSelectedPlayer.addGameSkill(new GameSkill(game, 1)); // current selected puts team out of range
+        currentPlayerSelection.push(currentSelectedPlayer);
+
+        let alternativePlayerSelection: Array<Player> = new Array<Player>();
+        let alternativePlayer: Player = new Player("AnotherInterestingChoice");
+        alternativePlayer.addGameSkill(new GameSkill(game, 3));
+        alternativePlayerSelection.push(alternativePlayer);
+
+        let teamToSelectPlayersFor: Team = new Team("NotFullTeam", 2, game);
+        let playerOnTeam: Player = new Player("FirstOne");
+        playerOnTeam.addGameSkill(new GameSkill(game, 5));
+        expect(teamToSelectPlayersFor.addPlayer(playerOnTeam)).toEqual(true);
+    
+        const optimizedSelection: Array<Player> = selector.optimizePlayerSelectionOutOfRange(currentPlayerSelection, alternativePlayerSelection, teamToSelectPlayersFor, minTeamSkill, maxTeamSkill);
+        expect(optimizedSelection.length).toEqual(teamToSelectPlayersFor.targetSize - teamToSelectPlayersFor.currentSize);
+        expect(optimizedSelection).toContain(alternativePlayer); // alternative player selected
+     
+    });
+
+
+    it("Shall select best possible player if within range not possible.", () => {
+
+        const minTeamSkill: number = 7;
+        const maxTeamSkill: number = 7;
+
+        let currentPlayerSelection: Array<Player> = new Array<Player>();
+        let currentSelectedPlayer: Player = new Player("ChosenOne");
+        currentSelectedPlayer.addGameSkill(new GameSkill(game, 5)); // current selected puts team out of range
+        currentPlayerSelection.push(currentSelectedPlayer);
+
+        let alternativePlayerSelection: Array<Player> = new Array<Player>();
+        let alternativePlayer1: Player = new Player("AlternativeChoice");
+        alternativePlayer1.addGameSkill(new GameSkill(game, 4));
+        alternativePlayerSelection.push(alternativePlayer1);
+        let alternativePlayer2: Player = new Player("BetterAlternativeChoice");
+        alternativePlayer2.addGameSkill(new GameSkill(game, 3));
+        alternativePlayerSelection.push(alternativePlayer2);
+
+        let teamToSelectPlayersFor: Team = new Team("NotFullTeam", 2, game);
+        let playerOnTeam: Player = new Player("FirstOne");
+        playerOnTeam.addGameSkill(new GameSkill(game, 5));
+        expect(teamToSelectPlayersFor.addPlayer(playerOnTeam)).toEqual(true);
+    
+        const optimizedSelection: Array<Player> = selector.optimizePlayerSelectionOutOfRange(currentPlayerSelection, alternativePlayerSelection, teamToSelectPlayersFor, minTeamSkill, maxTeamSkill);
+        expect(optimizedSelection.length).toEqual(teamToSelectPlayersFor.targetSize - teamToSelectPlayersFor.currentSize);
+        expect(optimizedSelection).toContain(alternativePlayer2); // best alternative selected although team not in skill range.
+     
+    });
    
  
   });
