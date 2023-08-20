@@ -211,6 +211,67 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
      
     });
 
+    it("Shall not accept too few selectable players.", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let selectablePlayerListWithTeamMembers: Array<Player> = new Array<Player>();
+
+        let player: Player = new Player("OneAdditionalPlayer"); // only one player selectable although more needed to fill team
+        player.addGameSkill(new GameSkill(game, 3));
+        selectablePlayerListWithTeamMembers.push(player);
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayerListWithTeamMembers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.NotEnoughPlayersProvided);
+        
+     
+    });
+
+    it("Shall not accept selectable players with missing game skill to join team.", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let selectablePlayerListWithTeamMembers: Array<Player> = new Array<Player>();
+
+        for (let i = 0; i < 10; i++){
+            let player: Player = new Player("Player" + i);
+            selectablePlayerListWithTeamMembers.push(player);
+        }
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayerListWithTeamMembers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("number");
+
+        const errorCode: SelectorErrorCode = validateResult as SelectorErrorCode;
+        expect(errorCode).toEqual(SelectorErrorCode.PlayerSkillsIncomplete);
+        
+     
+    });
+
+    it("Shall accept selectable player input if all criteria is fulfilled.", () => {
+
+        const minTeamSkill: number = 10;
+        const maxTeamSkill: number = 20;
+
+        let selectablePlayerListWithTeamMembers: Array<Player> = new Array<Player>();
+
+        for (let i = 0; i < 10; i++){
+            let player: Player = new Player("Player" + i);
+            player.addGameSkill(new GameSkill(game, (i % 5) + 1));
+            selectablePlayerListWithTeamMembers.push(player);
+        }
+    
+        const validateResult: SelectorErrorCode | undefined = selector.validateSelectorInput(selectablePlayerListWithTeamMembers, team, minTeamSkill, maxTeamSkill);
+        expect(validateResult).toBeTypeOf("undefined"); //success
+     
+    });
+
+    //TODO(tg): add further input validation tests including success case!!
+
 
     it("Shall ensure that random player selection part is based on a random source.", () => {
 
