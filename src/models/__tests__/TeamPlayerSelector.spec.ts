@@ -270,8 +270,6 @@ describe("OptimalTeamPlayerSelectorInterfaceTest", () => {
      
     });
 
-    //TODO(tg): add further input validation tests including success case!!
-
 
     it("Shall ensure that random player selection part is based on a random source.", () => {
 
