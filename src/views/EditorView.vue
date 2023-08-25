@@ -59,7 +59,7 @@
       </v-card>
     </v-col>
   </v-row>
-  <v-dialog v-model="playerDetailDialog" :scrollable="true" @keydown.esc="cancelPlayerDetail">
+  <v-dialog v-model="playerDetailDialog" :scrollable="true" persistent>
     <PlayerDetail
         :playerDetail="playerDetail"
         @cancel-dialog="cancelPlayerDetail"
@@ -67,7 +67,7 @@
         @delete-player="deletePlayerDetail"
     ></PlayerDetail>
   </v-dialog>
-  <v-dialog v-model="gameDetailDialog">
+  <v-dialog v-model="gameDetailDialog" persistent>
     <GameDetail
         :gameDetail="gameDetail"
         @cancel-dialog="cancelGameDetail"
@@ -80,6 +80,7 @@
 <script setup lang="ts">
 import PlayerDetail from "@/components/PlayerDetail.vue";
 import GameDetail from "@/components/GameDetail.vue";
+import TeamTile from "@/components/TeamTile.vue";
 import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 import {computed, ref} from "vue";
@@ -189,7 +190,7 @@ function showGameDetail(game: Game) {
   gameDetailDialog.value = true;
 }
 
-// TODO Possible refactoring: Add new or edit is quite similar, now we just differ with a detail variable called e.g. playerDetail or gameDetail
+// TODO(bn) Possible refactoring: Add new or edit is quite similar, now we just differ with a detail variable called e.g. playerDetail or gameDetail
 </script>
 
 <style scoped>

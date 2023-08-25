@@ -78,7 +78,7 @@ async function submit() {
 }
 
 
-// TODO next to game name required rule, also a check if name already exist in games array;
+// TODO(bn) next to game name required rule, also a check if name already exist in games array;
 </script>
 
 <style scoped></style>

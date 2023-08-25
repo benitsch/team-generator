@@ -3,7 +3,7 @@ import type Game from "@/models/Game";
 
 export default class GameSkill {
     private _id = "";
-    private readonly _game: Game;
+    private _game: Game;
     private _skillLevel = 0;
 
     constructor(game: Game, skillLevel?: number) {
@@ -18,8 +18,16 @@ export default class GameSkill {
         return this._id;
     }
 
+    set id(value: string) {
+        this._id = value;
+    }
+
     get game(): Game {
         return this._game;
+    }
+
+    set game(value: Game) {
+        this._game = value;
     }
 
     get skillLevel(): number {

@@ -13,7 +13,7 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      provider: 'c8' // or 'istanbul'
+      provider: 'v8' // or 'istanbul'
     },
   },
 });

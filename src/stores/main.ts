@@ -7,8 +7,8 @@ import GameSkill from "@/models/GameSkill";
 export const useMainStore = defineStore({
     id: "main",
     state: () => ({
-        players: [] as Player[],
-        games: [] as Game[]
+        players: [] as Array<Player>,
+        games: [] as Array<Game>
     }),
     getters: {
         getJson: function (state) {
@@ -30,29 +30,22 @@ export const useMainStore = defineStore({
             const data = JSON.parse(content);
 
             const players = data._players.map((playerData: any) => {
-                const player = new Player();
+                const player = new Player(playerData._tag, playerData._firstName, playerData._lastName);
                 player.id = playerData._id;
-                player.tag = playerData._tag;
-                player.firstName = playerData._firstName;
-                player.lastName = playerData._lastName;
                 player.gameSkills = playerData._gameSkills.map((skillData: any) => {
-                    const gameSkill = new GameSkill();
+                    const gameSkill = new GameSkill(new Game(), skillData._skillLevel);
                     gameSkill.id = skillData._id;
-                    gameSkill.game = new Game();
                     gameSkill.game.id = skillData._game._id;
                     gameSkill.game.name = skillData._game._name;
                     gameSkill.game.genre = skillData._game._genre;
-                    gameSkill.skillLevel = skillData._skillLevel;
                     return gameSkill;
                 });
                 return player;
             });
 
             const games = data._games.map((gameData: any) => {
-                const game = new Game();
+                const game = new Game(gameData._name, gameData._genre);
                 game.id = gameData._id;
-                game.name = gameData._name;
-                game.genre = gameData._genre;
                 return game;
             });
 

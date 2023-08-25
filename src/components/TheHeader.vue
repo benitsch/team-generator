@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app elevation="2">
     <v-img src="src/assets/logo.svg"></v-img>
-    <!-- TODO Another Font for "LanCraft" title -->
+    <!-- TODO(bn) Another Font for "LanCraft" title -->
     <v-app-bar-title>LanCraft</v-app-bar-title>
     <v-spacer></v-spacer>
     <v-tabs>

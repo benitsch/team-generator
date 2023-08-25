@@ -115,7 +115,9 @@ function ensureGameSkills() {
   if (player.value.gameSkills.length === 0 || player.value.gameSkills.length !== state.games.length) {
     state.games.forEach(game => {
       if (!player.value.gameSkills.some(skill => skill.game?.id === game.id)) {
-        const gameSkill = new GameSkill(new Game());
+        const g = new Game(game.name, game.genre)
+        g.id = game.id;
+        const gameSkill = new GameSkill(g);
         player.value.gameSkills.push(gameSkill);
       }
     });
@@ -123,7 +125,7 @@ function ensureGameSkills() {
 }
 
 
-// TODO next to player tag required rule, also a check if tag already exist in player array;
+// TODO(bn) next to player tag required rule, also a check if tag already exist in player array;
 </script>
 
 <style scoped></style>
