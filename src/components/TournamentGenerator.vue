@@ -4,8 +4,15 @@
     <v-card>
       <v-card-title>Create a tournament</v-card-title>
       <v-card-text>
-        <!-- TODO(bn) add multi select with all players next to game and team size, to select only the players who want to participate in the tournament -->
         <!-- Add a hint/warning for players where the gameskill is 0 (default) and therefore not rated -->
+        <v-select
+            v-model="selectedParticipants"
+            :items="state.players"
+            label="Player"
+            multiple
+            item-value="id"
+            item-title="tag"
+        ></v-select>
         <v-select
             v-model="selectedGameId"
             :items="state.games"
@@ -50,8 +57,9 @@ import Match from "@/models/Match";
 
 const state = useMainStore();
 
-const teamSize = ref();
+const selectedParticipants = ref([]);
 const selectedGameId = ref();
+const teamSize = ref();
 const possibleTeamSizes = [2,3,4,5,6,7,8,9,10];
 
 const generatedTeams = ref([]);
@@ -61,7 +69,8 @@ const snackbar = ref(false);
 const errorMessage = ref("");
 
 function generateTeams() {
-  const players: Array<Player> = state.players;
+  console.log(selectedParticipants.value);
+  const players: Array<Player> = getPlayerById(selectedParticipants.value);
   const game: Game = getGameBySelectedId();
   const balancedRandomTeamGenerator = new BalancedRandomTeamGenerator();
   const teams: Array<Team> | GeneratorErrorCode = balancedRandomTeamGenerator.generate(players, teamSize.value, game);
@@ -76,6 +85,11 @@ function generateTeams() {
   }
   generatedTeamsAsMatchPair();
 }
+
+function getPlayerById(playerIds: string[]) {
+  return state.players.filter(player => playerIds.includes(player.id));
+}
+
 
 function getErrorTextByCode(code:number) {
   switch (code) {
