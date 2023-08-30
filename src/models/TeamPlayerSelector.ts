@@ -66,6 +66,36 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
      * @returns 
      */
     public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
+        
+        // Step 1: Validate input 
+        let validationResult: SelectorErrorCode | undefined = this.validateSelectorInput(players, team, minTeamSkill, maxTeamSkill);
+        if (validationResult !== undefined){
+            return validationResult;
+        }
+        
+        // Step 2: Select random players from list
+        let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
+        let [randomPlayerSelection, alternativePlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
+
+        // Step 3: Check if team within bounds and optimize if not
+        return this.optimizePlayerSelectionOutOfRange(randomPlayerSelection, alternativePlayers, team, minTeamSkill, maxTeamSkill);
+
+    }
+
+    /**
+     * This function validates if the given players have an assessed skill for the given game,
+     * that none of the given players are already on the team and if there are enough players 
+     * to fill up the team to its target size.
+     * 
+     * This validation shall be called prior to any other function call in the team generator!!!!
+     * 
+     * @param players The player list to be validated in length (at least required amount to fill target team size)
+     * @param minTeamSkill The minTeamskill must be validated in comparison with maxTeamSkill.
+     * @param maxTeamSkill The maxTeamSkill must be validated in comparison with minTeamSkill.
+     * @param team The team to check the amount of players to be added and game to be played.
+     * @returns Error code if validation fails, undefined otherwise.
+     */
+    protected validateSelectorInput(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): SelectorErrorCode | undefined {
 
         if (minTeamSkill < 0 || maxTeamSkill < 0){
             return SelectorErrorCode.TeamSkillRangeNegative;
@@ -79,34 +109,6 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
         if (team.isFull){
             return SelectorErrorCode.TeamAlreadyFull;
         }
-        
-        // Step 2: Validate input 
-        let validationResult: SelectorErrorCode | undefined = this.validateSelectorInput(players, team);
-        if (validationResult !== undefined){
-            return validationResult;
-        }
-        
-        // Step 3: Select random players from list
-        let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
-        let [randomPlayerSelection, alternativePlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
-
-        // Step 4: Check if team within bounds and optimize if not
-        return this.optimizePlayerSelectionOutOfRange(randomPlayerSelection, alternativePlayers, team, minTeamSkill, maxTeamSkill);
-
-    }
-
-    /**
-     * This function validates if the given players have an assessed skill for the given game,
-     * that none of the given players are already on the team and if there are enough players 
-     * to fill up the team to its target size.
-     * 
-     * This validation shall be called prior to any other function call in the team generator!!!!
-     * 
-     * @param players The player list to be validated in length (at least required amount to fill target team size)
-     * @param team The team to check the amount of players to be added and game to be played.
-     * @returns Error code if validation fails, undefined otherwise.
-     */
-    protected validateSelectorInput(players: Array<Player>, team: Team): SelectorErrorCode | undefined {
 
         //--> playerlist must not contain duplicates
         for(let i = 0; i < players.length; i++){
