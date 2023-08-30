@@ -4,9 +4,9 @@ import Team from "@/models/Team";
 export default class Match {
     private _id = "";
     private _team: Team;
-    private _oppositeTeam:Team|null;
+    private _oppositeTeam:Team|undefined;
 
-    constructor(team: Team, oppositeTeam: Team) {
+    constructor(team: Team, oppositeTeam: Team|undefined) {
         this._id = uuidv4();
         this._team = team;
         this._oppositeTeam = oppositeTeam;
@@ -29,7 +29,7 @@ export default class Match {
         this._team = value;
     }
 
-    get oppositeTeam(): Team|null {
+    get oppositeTeam(): Team|undefined {
         return this._oppositeTeam;
     }
 

@@ -78,7 +78,7 @@ export default class Team {
     }
 
     getTeamGameSkill(): number {
-        let skill: number = 0;
+        let skill = 0;
         for (const player of this.allPlayers){
             skill += player.getSkillForGame(this.game);
         }

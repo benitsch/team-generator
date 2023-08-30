@@ -26,12 +26,11 @@
         <v-btn
             elevation="2"
             color="red darken-1"
-            text
+            text="Cancel"
             @click="emit('cancelDialog')"
         >
-          Cancel
         </v-btn>
-        <v-btn elevation="2" color="green darken-1" text @click="submit">
+        <v-btn elevation="2" color="green darken-1" @click="submit">
           {{ isEdit ? 'Edit' : 'Add' }}
         </v-btn>
       </v-card-actions>

@@ -3,12 +3,16 @@ import Player from "@/models/Player";
 import Game from "@/models/Game";
 import JsonObject from "@/models/JsonObject";
 import GameSkill from "@/models/GameSkill";
+import TeamMatch from "@/components/TeamMatch.vue";
 
 export const useMainStore = defineStore({
     id: "main",
     state: () => ({
         players: [] as Array<Player>,
-        games: [] as Array<Game>
+        games: [] as Array<Game>,
+        matches: [] as Array<TeamMatch>,
+        minTeamSkill: 0 as number,
+        maxTeamSkill: 0 as number,
     }),
     getters: {
         getJson: function (state) {

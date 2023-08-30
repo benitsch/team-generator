@@ -4,7 +4,7 @@
   <TournamentGenerator></TournamentGenerator>
 </template>
 
-<script>
+<script lang="ts">
 import {defineComponent} from "vue";
 import TournamentGenerator from "@/components/TournamentGenerator.vue";
 

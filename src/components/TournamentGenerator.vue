@@ -4,7 +4,6 @@
     <v-card>
       <v-card-title>Create a tournament</v-card-title>
       <v-card-text>
-        <!-- Add a hint/warning for players where the gameskill is 0 (default) and therefore not rated -->
         <v-select
             v-model="selectedParticipants"
             :items="state.players"
@@ -12,7 +11,27 @@
             multiple
             item-value="id"
             item-title="tag"
-        ></v-select>
+        >
+<!--          <template v-slot:prepend-item>-->
+<!--            <v-list-item-->
+<!--                title="Select All"-->
+<!--                @click="toggleSelectAll"-->
+<!--            >-->
+<!--              <template v-slot:prepend>-->
+<!--                <v-checkbox-btn-->
+<!--                    :color="someParticipantsSelected() ? 'indigo-darken-4' : undefined"-->
+<!--                    :indeterminate="someParticipantsSelected() && !allParticipantsSelected()"-->
+<!--                    :model-value="someParticipantsSelected()"-->
+<!--                ></v-checkbox-btn>-->
+<!--              </template>-->
+<!--            </v-list-item>-->
+
+<!--            <v-divider class="mt-2"></v-divider>-->
+<!--          </template>-->
+<!--          <template v-slot:selection="{ item }">-->
+<!--            <span>{{ item.title }}</span>-->
+<!--          </template>-->
+        </v-select>
         <v-select
             v-model="selectedGameId"
             :items="state.games"
@@ -62,16 +81,17 @@ const selectedGameId = ref();
 const teamSize = ref();
 const possibleTeamSizes = [2,3,4,5,6,7,8,9,10];
 
-const generatedTeams = ref([]);
-const generatedMatches = ref([]);
+const generatedTeams = ref<Team[]>([]);
+const generatedMatches = ref<Match[]>(state.matches);
 
 const snackbar = ref(false);
 const errorMessage = ref("");
 
 function generateTeams() {
-  console.log(selectedParticipants.value);
   const players: Array<Player> = getPlayerById(selectedParticipants.value);
   const game: Game = getGameBySelectedId();
+  generatedTeams.value.splice(0);
+
   const balancedRandomTeamGenerator = new BalancedRandomTeamGenerator();
   const teams: Array<Team> | GeneratorErrorCode = balancedRandomTeamGenerator.generate(players, teamSize.value, game);
   if (typeof teams != "number") {
@@ -83,8 +103,27 @@ function generateTeams() {
     errorMessage.value = getErrorTextByCode(teams);
     snackbar.value = true;
   }
+  setMinMaxTeamSkill();
   generatedTeamsAsMatchPair();
 }
+
+// TODO implement "Select All" feature in v-select for participants (player)
+// function allParticipantsSelected() {
+//   return selectedParticipants.value.length === state.players.length;
+// }
+//
+// function someParticipantsSelected() {
+//   return selectedParticipants.value.length > 0;
+// }
+//
+// function toggleSelectAll() {
+//   if (allParticipantsSelected()) {
+//     selectedParticipants.value.splice(0);
+//   } else {
+//     selectedParticipants.value.splice(0);
+//     selectedParticipants.value.push(...state.players.map(player => player.tag));
+//   }
+// }
 
 function getPlayerById(playerIds: string[]) {
   return state.players.filter(player => playerIds.includes(player.id));
@@ -105,19 +144,33 @@ function getErrorTextByCode(code:number) {
 }
 
 function getGameBySelectedId() {
-  return state.games.find(game => game.id === selectedGameId.value);
+  const selectedGame = state.games.find(game => game.id === selectedGameId.value);
+  return selectedGame ? selectedGame : new Game();
 }
 
 function generatedTeamsAsMatchPair() {
   const teamsLength = generatedTeams.value.length;
+  generatedMatches.value.splice(0);
 
   for (let i = 0; i < teamsLength; i = i+2) {
     if (i + 1 < teamsLength) {
       generatedMatches.value.push(new Match(generatedTeams.value[i], generatedTeams.value[i + 1]));
     } else {
-      generatedMatches.value.push(new Match(generatedTeams.value[i], null));
+      generatedMatches.value.push(new Match(generatedTeams.value[i], undefined));
     }
   }
+  state.matches = generatedMatches.value;
+}
+
+function setMinMaxTeamSkill() {
+  const teamSkills: number[] = [];
+  for (const team of generatedTeams.value) {
+    teamSkills.push(team.getTeamGameSkill());
+  }
+
+  state.maxTeamSkill = Math.max(...teamSkills);
+  state.minTeamSkill = Math.min(...teamSkills);
+
 }
 
 </script>

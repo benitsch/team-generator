@@ -102,12 +102,18 @@
         <v-row no-gutters>
           <v-col class="players-list">
             <template v-for="player in team.fixedPlayers" :key="player.id">
-              <p class="player-name" :title="getPlayerTitleAttr(player)">{{player.tag}}</p>
+              <div class="d-flex name-container">
+                <p class="player-name" :title="getPlayerTitleAttr(player)">{{player.tag}}</p>
+                <v-icon class="delete-player" @click="removePlayer(player)">mdi-delete-outline</v-icon>
+              </div>
             </template>
           </v-col>
           <v-col class="sub-player-list">
             <template v-for="subPlayer in team.substitutionPlayers" :key="subPlayer.id">
-              <p :title="getPlayerTitleAttr(subPlayer)">{{subPlayer.tag}}</p>
+              <div class="d-flex name-container">
+                <p :title="getPlayerTitleAttr(subPlayer)">{{subPlayer.tag}}</p>
+                <v-icon class="delete-player" @click="removePlayer(subPlayer)">mdi-delete-outline</v-icon>
+              </div>
             </template>
           </v-col>
         </v-row>
@@ -198,17 +204,21 @@ function automaticallyAddPlayerToTeam() {
   const optimalTeamPlayerSelector = new OptimalTeamPlayerSelector();
   const selectablePlayers = getAllPossiblePlayersToAdd();
 
-  // TODO(bn) change min and maxTeamSkill numbers
-  const addablePlayers = optimalTeamPlayerSelector.selectPlayers(selectablePlayers, team, 10, 10);
+  const addablePlayers = optimalTeamPlayerSelector.selectPlayers(selectablePlayers, team, state.minTeamSkill, state.maxTeamSkill);
   if (typeof addablePlayers != "number") {
     for(let i = 0; i < addablePlayers.length; i++) {
-      team?.addPlayer(addablePlayers[i]);
+      if (addSubplayer.value) {
+        team?.addSubstitutionPlayer(addablePlayers[i]);
+      } else {
+        team?.addPlayer(addablePlayers[i]);
+      }
     }
   } else {
     console.log("Error Code: " + addablePlayers);
     errorMessage.value = getErrorTextByCode(addablePlayers);
     snackbar.value = true;
   }
+  clearPlayerSelection();
 }
 
 function getErrorTextByCode(code:number) {
@@ -242,6 +252,10 @@ function getPlayerTitleAttr(player:Player) {
   return player.firstName + ' ' + player.lastName + ', ' + 'Skill: ' + currentGameSkill;
 }
 
+function removePlayer(player:Player) {
+  team?.removePlayer(player);
+}
+
 </script>
 
 <style scoped>
@@ -266,11 +280,22 @@ function getPlayerTitleAttr(player:Player) {
     color: red;
   }
 
+  .delete-player {
+    color: red;
+    cursor: pointer;
+    visibility: hidden;
+  }
+
+  .name-container:hover .delete-player {
+    visibility: visible;
+  }
+
   .players-list, .sub-player-list {
     font-size: 13px;
   }
 
   .player-name {
     font-weight: bold;
+    user-select: none;
   }
 </style>

@@ -15,4 +15,10 @@ import TheFooter from "./components/TheFooter.vue";
   </v-app>
 </template>
 
-<style scoped></style>
+<style>
+@font-face {
+  font-family: "LifeCraft";
+  src: local("LifeCraft"),
+  url(/fonts/LifeCraft_Font.ttf) format("truetype");
+}
+</style>
