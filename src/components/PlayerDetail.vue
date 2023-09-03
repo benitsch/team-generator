@@ -37,7 +37,7 @@
           <v-slider
               v-model="player.gameSkills[i].skillLevel"
               :ticks="gameTickLabels"
-              :max="5"
+              :max="10"
               step="1"
               show-ticks="always"
               tick-size="4"
@@ -93,7 +93,7 @@ player.value.gameSkills = props.playerDetail?.gameSkills ?? [];
 
 ensureGameSkills();
 
-const gameTickLabels = [0, 1, 2, 3, 4, 5];
+const gameTickLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const rules = ref({
   required: (value: string) => !!value || "Field is required"
