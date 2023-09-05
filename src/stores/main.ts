@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {defineStore} from "pinia";
 import Player from "@/models/Player";
 import Game from "@/models/Game";

@@ -3,7 +3,7 @@ export default interface RandomSource {
     /**
      * Returns a random number between 0 and 1
      */
-    public getRandomNumber(): number;
+    getRandomNumber(): number;
 }
 
 export default class DefaultRandomSource implements RandomSource {

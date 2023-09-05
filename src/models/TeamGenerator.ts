@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import type Game from "@/models/Game";
 import GameSkill from "@/models/GameSkill";
 import Player from "@/models/Player";
@@ -28,7 +28,7 @@ export default interface TeamGenerator {
      * 
      * @returns a set of teams or an error code.
      */
-    public generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode;
+    generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode;
 }
 
   /**

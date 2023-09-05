@@ -34,7 +34,7 @@ export default interface TeamPlayerSelector {
      * 
      * @returns a player selection for the team or an error code.
      */
-    public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode;
+    selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode;
 }
 
 export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {

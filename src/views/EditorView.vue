@@ -78,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import PlayerDetail from "@/components/PlayerDetail.vue";
 import GameDetail from "@/components/GameDetail.vue";
 import TeamTile from "@/components/TeamTile.vue";

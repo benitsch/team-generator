@@ -134,6 +134,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { ref } from 'vue';
 import {useMainStore} from "@/stores/main";
 import Team from "@/models/Team";

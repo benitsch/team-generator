@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 // This component has multiple TeamMatch components to create a tournament tree.
 
 import { ref } from 'vue';

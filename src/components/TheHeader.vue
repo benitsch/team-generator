@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app elevation="2">
-    <v-img src="src/assets/logo.jpg" alt="LanCraft Logo"></v-img>
+    <v-img src="logo.jpg" alt="LanCraft Logo"></v-img>
     <v-app-bar-title class="lancraft-title">LanCraft</v-app-bar-title>
     <v-spacer></v-spacer>
     <v-tabs>
