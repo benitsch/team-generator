@@ -73,8 +73,8 @@ const state = useMainStore();
 const emit = defineEmits(["savePlayer", "cancelPlayer", "deletePlayer", "cancelDialog"]);
 const props = defineProps({
   playerDetail: {
-    type: Player,
-    // default: null
+    type: Object as () => Player | null | undefined,
+    default: null
   }
 });
 

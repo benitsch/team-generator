@@ -12,25 +12,30 @@
             item-value="id"
             item-title="tag"
         >
-<!--          <template v-slot:prepend-item>-->
-<!--            <v-list-item-->
-<!--                title="Select All"-->
-<!--                @click="toggleSelectAll"-->
-<!--            >-->
-<!--              <template v-slot:prepend>-->
-<!--                <v-checkbox-btn-->
-<!--                    :color="someParticipantsSelected() ? 'indigo-darken-4' : undefined"-->
-<!--                    :indeterminate="someParticipantsSelected() && !allParticipantsSelected()"-->
-<!--                    :model-value="someParticipantsSelected()"-->
-<!--                ></v-checkbox-btn>-->
-<!--              </template>-->
-<!--            </v-list-item>-->
 
-<!--            <v-divider class="mt-2"></v-divider>-->
-<!--          </template>-->
+          <template v-slot:prepend-item>
+            <v-list-item
+                title="Select All"
+                @click="toggleSelectAllPlayer"
+            >
+              <template v-slot:prepend>
+                <v-checkbox-btn
+                    :color="somePlayerSelected ? 'indigo-darken-4' : undefined"
+                    :indeterminate="somePlayerSelected && !allPlayerSelected"
+                    :model-value="somePlayerSelected"
+                ></v-checkbox-btn>
+              </template>
+            </v-list-item>
+
+            <v-divider class="mt-2"></v-divider>
+          </template>
 <!--          <template v-slot:selection="{ item }">-->
 <!--            <span>{{ item.title }}</span>-->
 <!--          </template>-->
+
+
+
+
         </v-select>
         <v-select
             v-model="selectedGameId"
@@ -46,27 +51,54 @@
         ></v-select>
       </v-card-text>
       <v-card-actions class="justify-end">
-        <v-btn elevation="2" prepend-icon="mdi-tournament" @click="generateTeams">
+        <v-btn elevation="2" prepend-icon="mdi-tournament" @click="generateTournamentTree">
           Generate
         </v-btn>
       </v-card-actions>
     </v-card>
 
-    <div class="matches-container d-flex flex-wrap">
-      <template v-for="match in generatedMatches" :key="match.id">
-        <TeamMatch :match="match" :game="getGameBySelectedId()"></TeamMatch>
-      </template>
+
+
+    <div class="test-container">
+      <div class="rr">
+        <div class="team-tile__placeholder"></div>
+      </div>
+      <div class="rr">
+        <div class="team-tile__placeholder"></div>
+        <div class="team-tile__placeholder"></div>
+      </div>
+      <div class="rr">
+        <TestTeamTile></TestTeamTile>
+        <TestTeamTile></TestTeamTile>
+        <TestTeamTile></TestTeamTile>
+        <TestTeamTile></TestTeamTile>
+      </div>
+
     </div>
+
+
+    <recursive-tree :node="tree"></recursive-tree>
+
+
+<!--    <div class="matches-container d-flex flex-wrap">-->
+<!--      <template v-for="(match, index) in generatedMatches" :key="match.id">-->
+<!--        <TeamMatch-->
+<!--            :match="match"-->
+<!--            :game="getGameBySelectedId()"-->
+<!--            @move-up="moveTeamUp(index)"-->
+<!--            @move-down="moveTeamDown(index)"-->
+<!--        ></TeamMatch>-->
+<!--      </template>-->
+<!--    </div>-->
 
     <v-snackbar v-model="snackbar" timeout="5000" min-width="0" close-on-content-click>{{errorMessage}}</v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 // This component has multiple TeamMatch components to create a tournament tree.
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import TeamMatch from "@/components/TeamMatch.vue";
 import {useMainStore} from "@/stores/main";
 import BalancedRandomTeamGenerator, {GeneratorErrorCode} from "@/models/TeamGenerator";
@@ -74,6 +106,8 @@ import Game from "@/models/Game";
 import Team from "@/models/Team";
 import Player from "@/models/Player";
 import Match from "@/models/Match";
+import TestTeamTile from "@/components/TestTeamTile.vue";
+import RecursiveTree from "@/components/RecursiveTree.vue";
 
 const state = useMainStore();
 
@@ -88,9 +122,66 @@ const generatedMatches = ref<Match[]>(state.matches);
 const snackbar = ref(false);
 const errorMessage = ref("");
 
+// const rows = ref<any>([]);
+
+const tree = {
+      id: 1,
+      name: 'W0',
+      children: [
+      {
+        id: 2,
+        name: 'W1',
+        children: [
+          {
+            id: 3,
+            name: 'T1',
+          },
+          {
+            id: 4,
+            name: 'T2',
+          },
+        ],
+      },
+      {
+        id: 5,
+        name: 'W1_2',
+        children: [
+          {
+            id: 6,
+            name: 'T3',
+          },
+          {
+            id: 7,
+            name: 'T4',
+          },
+        ],
+      },
+    ],
+};
+// ... Weitere Teile des Baums hier
+
+const matches = [
+  {
+    winner: "Team 1",
+    loser: "Team 2",
+  },
+  {
+    winner: "Team 3",
+    loser: "Team 4",
+  },
+]
+setWinners();
+function setWinners() {
+  for (let i = 0; i < matches.length; i++) {
+    if (matches[i].winner == null) {
+      matches[i].winner = "Team " + (i + 1);
+    }
+  }
+}
+
 function generateTeams() {
-  const players: Array<Player> = getPlayerById(selectedParticipants.value);
-  const game: Game = getGameBySelectedId();
+  const players: Array<Player> = getPlayerById(selectedParticipants.value) as Array<Player>;
+  const game: Game = getGameBySelectedId() as Game;
   generatedTeams.value.splice(0);
 
   const balancedRandomTeamGenerator = new BalancedRandomTeamGenerator();
@@ -125,6 +216,56 @@ function generateTeams() {
 //     selectedParticipants.value.push(...state.players.map(player => player.tag));
 //   }
 // }
+
+function generateTournamentTree() {
+  const numberOfTeams = 4;
+  const data = {};
+
+  for (let i = 0; i < Math.ceil(Math.log2(numberOfTeams)); i++) {
+
+  }
+  // console.log("start creating with numberOfTeams: ", numberOfTeams);
+  //
+  // // const rounds = [];
+  //
+  // for (let i = 0; i < Math.log2(numberOfTeams); i++) {
+  //   // const round = [];
+  //   console.log("log");
+  //
+  //   for (let j = 0; j < Math.pow(2, i); j++) {
+  //     console.log("pow");
+  //   }
+  //
+  //   // if (i === 0) {
+  //   //   // Untere Runde: Tatsächliche Teams
+  //   //   for (let j = 0; j < Math.pow(2, i); j++) {
+  //   //     round.push({
+  //   //       team1: `Team ${(i * Math.pow(2, i)) + (2 * j) + 1}`,
+  //   //       team2: `Team ${(i * Math.pow(2, i)) + (2 * j) + 2}`,
+  //   //       winner: ''
+  //   //     });
+  //   //   }
+  //   // } else {
+  //   //   // Über den unteren Runden: Platzhalter für Gewinner
+  //   //   for (let j = 0; j < Math.pow(2, i); j++) {
+  //   //     round.push({
+  //   //       team1: '',
+  //   //       team2: '',
+  //   //       winner: 'Winner'
+  //   //     });
+  //   //   }
+  //   // }
+  //
+  //   // rounds.push(round);
+  // }
+  //
+  // // Füge eine spezielle Runde für den Turniersieger hinzu
+  // // rounds.push([{ winner: 'Final Winner' }]);
+  //
+  // // rows.value.push(rounds);
+  // console.log("end creating");
+
+}
 
 function getPlayerById(playerIds: string[]) {
   return state.players.filter(player => playerIds.includes(player.id));
@@ -174,8 +315,56 @@ function setMinMaxTeamSkill() {
 
 }
 
+function moveTeamUp(index: number) {
+  if (index > 0) {
+    const temp = generatedMatches.value[index - 1];
+    generatedMatches.value[index - 1] = generatedMatches.value[index];
+    generatedMatches.value[index] = temp;
+  }
+}
+
+function moveTeamDown(index: number) {
+  if (index < generatedMatches.value.length - 1) {
+    const temp = generatedMatches.value[index + 1];
+    generatedMatches.value[index + 1] = generatedMatches.value[index];
+    generatedMatches.value[index] = temp;
+  }
+}
+
+function toggleSelectAllPlayer () {
+  if (allPlayerSelected.value) {
+    selectedParticipants.value = [];
+  } else {
+    selectedParticipants.value = state.players.map((player) => player.id);
+  }
+}
+
+const allPlayerSelected = computed(() => {
+  return selectedParticipants.value.length === state.players.length;
+});
+
+const somePlayerSelected = computed(() => {
+  return selectedParticipants.value.length > 0;
+});
+
 </script>
 
 <style scoped>
+.test-container {
+  display: flex;
+  flex-direction: column;
+}
 
+.team-tile__placeholder {
+  width: 250px;
+  height: 100px;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.rr {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around
+}
 </style>

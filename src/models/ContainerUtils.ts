@@ -19,7 +19,7 @@ export default class ContainerUtils {
 
  static sortMapDescendingByKey(map: Map<number, any>): void {
     const  descendingComparer= (pairA: [number, any], pairB: [number, any]): number => {return pairB[0] - pairA[0]};
-    let sortedMap: Map<number, any> = new Map<number, any>([...map].sort(descendingComparer));
+    const sortedMap: Map<number, any> = new Map<number, any>([...map].sort(descendingComparer));
     map = sortedMap;
  }
 

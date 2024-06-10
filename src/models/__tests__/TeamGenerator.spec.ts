@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { describe, it, expect } from "vitest";
-import { imock, instance, when, thenReturn } from "@johanblumenberg/ts-mockito";
+import { imock, instance, when } from "@johanblumenberg/ts-mockito";
 
 import Team from "../Team";
 import Player from "../Player";
@@ -42,14 +41,14 @@ class BalancedRandomTeamGeneratorUnderTest extends BalancedRandomTeamGenerator {
 describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     const game: Game = new Game("HOTS", "MOBA");
-    let generator: TeamGenerator = new BalancedRandomTeamGenerator();
+    const generator: TeamGenerator = new BalancedRandomTeamGenerator();
 
 
     it("Shall not accept invalid input.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
     
-        let players: Array<Player> = new Array<Player>(); // empty player list
+        const players: Array<Player> = new Array<Player>(); // empty player list
     
         const generateResult: Array<Team> | GeneratorErrorCode = generator.generate(players, teamSize, game);
         expect(generateResult).toBeTypeOf("number"); // error code
@@ -60,13 +59,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall generate the expected amount of full teams.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 9;
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player"+i);
+            const player: Player = new Player("Player"+i);
             player.addGameSkill(new GameSkill(game, i%5 + 1));
             players.push(player);
         }
@@ -78,7 +77,7 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
         expect(teams.length).toEqual(3);
 
-        for (let team of teams){
+        for (const team of teams){
             expect(team.targetSize).toEqual(teamSize);
             expect(team.isFull).toBe(true);
         }
@@ -87,13 +86,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall generate the expected amount teams with one team that is missing 1 player.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 8; // one team will have only 2 players
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player"+i);
+            const player: Player = new Player("Player"+i);
             player.addGameSkill(new GameSkill(game, i%5 + 1));
             players.push(player);
         }
@@ -105,8 +104,8 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
         expect(teams.length).toEqual(3);
 
-        let teamsNotFull: number = 0;
-        for (let team of teams){
+        let teamsNotFull = 0;
+        for (const team of teams){
             expect(team.targetSize).toEqual(teamSize);
             if(!team.isFull){
                 expect(team.currentSize).toEqual(team.targetSize - 1);
@@ -120,13 +119,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall generate the expected amount of teams with one team that has only one player.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 7; // one team will have only 1 player
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player"+i);
+            const player: Player = new Player("Player"+i);
             player.addGameSkill(new GameSkill(game, i%5 + 1));
             players.push(player);
         }
@@ -138,8 +137,8 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
         expect(teams.length).toEqual(3);
 
-        let teamsNotFull: number = 0;
-        for (let team of teams){
+        let teamsNotFull = 0;
+        for (const team of teams){
             expect(team.targetSize).toEqual(teamSize);
             if(!team.isFull){
                 expect(team.currentSize).toEqual(1);
@@ -164,11 +163,11 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall not accept duplicate players at input validation.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 9;
     
-        let players: Array<Player> = new Array<Player>();
-        let player: Player = new Player("PlayerOne");
+        const players: Array<Player> = new Array<Player>();
+        const player: Player = new Player("PlayerOne");
         player.addGameSkill(new GameSkill(game, 3));
     
         for(let i = 0; i < amountOfPlayers; i++){
@@ -185,13 +184,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall not accept too few players at input validation (at least two teams must be creatable!).", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 5;
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player" + i);
+            const player: Player = new Player("Player" + i);
             player.addGameSkill(new GameSkill(game, 3));
             players.push(player);
         }
@@ -206,13 +205,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall not accept players with no game assessment at input validation.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 8;
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player" + i);
+            const player: Player = new Player("Player" + i);
             player.addGameSkill(new GameSkill(game, 3));
             players.push(player);
         }
@@ -229,13 +228,13 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall accept valid input players enough to build at least two teams.", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
         const amountOfPlayers = 6;
     
-        let players: Array<Player> = new Array<Player>();
+        const players: Array<Player> = new Array<Player>();
     
         for(let i = 0; i < amountOfPlayers; i++){
-            let player: Player = new Player("Player" + i);
+            const player: Player = new Player("Player" + i);
             player.addGameSkill(new GameSkill(game, 3));
             players.push(player);
         }
@@ -249,18 +248,18 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall not swap players between 2 teams if skill diff is less or equal to 1", () => {
 
-        const teamSize: number = 3;
+        const teamSize = 3;
 
-        let team1: Team = new Team("Team1", teamSize, game);
+        const team1: Team = new Team("Team1", teamSize, game);
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerA" + i);
+            const player: Player = new Player("PlayerA" + i);
             player.addGameSkill(new GameSkill(game, 3));
             team1.addPlayer(player);
         }
 
-        let team2: Team = new Team("Team2", teamSize, game);
+        const team2: Team = new Team("Team2", teamSize, game);
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerB" + i);
+            const player: Player = new Player("PlayerB" + i);
             if(i === 0){
                 player.addGameSkill(new GameSkill(game, 4)); // to create team skill diff of 1
             }else{
@@ -279,18 +278,18 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall not swap players if team diff is higher than 1 but diff cannot be reduced.", () => {
 
-        const teamSize: number = 2;
+        const teamSize = 2;
 
-        let team1: Team = new Team("Team1", teamSize, game);
+        const team1: Team = new Team("Team1", teamSize, game);
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerA" + i);
+            const player: Player = new Player("PlayerA" + i);
             player.addGameSkill(new GameSkill(game, 2));
             team1.addPlayer(player);
         }
 
-        let team2: Team = new Team("Team2", teamSize, game);
+        const team2: Team = new Team("Team2", teamSize, game);
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerB" + i);
+            const player: Player = new Player("PlayerB" + i);
             if( i === 0){
                 player.addGameSkill(new GameSkill(game, 4)); // team 2 has one high skill player
             }else{
@@ -306,18 +305,18 @@ describe("BalancedRandomTeamGeneratorInterfaceTest", () => {
 
     it("Shall swap players if team diff is higher than 1 and diff can be reduced.", () => {
 
-        const teamSize: number = 2;
+        const teamSize = 2;
 
-        let team1: Team = new Team("Team1", teamSize, game); //low skill team
+        const team1: Team = new Team("Team1", teamSize, game); //low skill team
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerA" + i);
+            const player: Player = new Player("PlayerA" + i);
             player.addGameSkill(new GameSkill(game, 2));
             team1.addPlayer(player);
         }
 
-        let team2: Team = new Team("Team2", teamSize, game); //high skill team
+        const team2: Team = new Team("Team2", teamSize, game); //high skill team
         for(let i = 0; i < teamSize; i++){
-            let player: Player = new Player("PlayerB" + i);
+            const player: Player = new Player("PlayerB" + i);
             player.addGameSkill(new GameSkill(game, 4));
             team2.addPlayer(player);
         }

@@ -120,12 +120,12 @@
       </v-col>
       <v-divider vertical></v-divider>
       <v-col cols="2" class="team-tile__buttons">
-        <v-btn size="25" icon="mdi-arrow-up-bold-circle-outline" class="up"></v-btn>
+        <v-btn size="25" icon="mdi-arrow-up-bold-circle-outline" class="up" @click="emit('moveUp')"></v-btn>
         <div class="d-flex align-center">
           <v-icon size="20">mdi-arm-flex</v-icon>
           <div>{{team.getTeamGameSkill()}}</div>
         </div>
-        <v-btn size="25" icon="mdi-arrow-down-bold-circle-outline" class="down"></v-btn>
+        <v-btn size="25" icon="mdi-arrow-down-bold-circle-outline" class="down" @click="emit('moveDown')"></v-btn>
       </v-col>
 
     </v-row>
@@ -134,7 +134,6 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref } from 'vue';
 import {useMainStore} from "@/stores/main";
 import Team from "@/models/Team";
@@ -156,7 +155,7 @@ const props = defineProps({
     required: true
   }
 });
-
+const emit = defineEmits(["moveUp", "moveDown"]);
 const state = useMainStore();
 
 const team = props.team;

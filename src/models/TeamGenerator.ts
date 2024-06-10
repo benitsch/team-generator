@@ -1,6 +1,4 @@
-// @ts-nocheck
 import type Game from "@/models/Game";
-import GameSkill from "@/models/GameSkill";
 import Player from "@/models/Player";
 import Team from "@/models/Team";
 import ContainerUtils from "@/models/ContainerUtils";
@@ -108,19 +106,18 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
      * @returns A set of randomly assembled but balanced teams (where one team might not be full depending on the amount of given players and team size).
      */
     public generate(players: Array<Player>, teamSize: number, game: Game): Array<Team> | GeneratorErrorCode{
-
         //Step 1: do proper param check
-        let paramCheckResult: GeneratorErrorCode | undefined = this.validateGeneratorInput(players, teamSize, game);
+        const paramCheckResult: GeneratorErrorCode | undefined = this.validateGeneratorInput(players, teamSize, game);
         if (paramCheckResult !== undefined){
             return paramCheckResult;
         }
 
         //Step 2: order players by their skill descending and shuffle players with same skill in array
-        let orderedPlayerArray: Array<Player> = this.orderPlayersDescendingByGameSkill(players, game);
+        const orderedPlayerArray: Array<Player> = this.orderPlayersDescendingByGameSkill(players, game);
 
         
         //Step 3: create X full teams and one additional team with remaining players if any
-        let [fullTeams, additionalTeam] = this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
+        const [fullTeams, additionalTeam] = this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
         
 
         //Step 4: Refine team balance (swap players between best and worst team if possible)
@@ -186,7 +183,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
      */
     protected orderPlayersDescendingByGameSkill(players: Array<Player>, game: Game): Array<Player> {
         // map players in groups by their game skill
-        let playerSkillMapping: Map<number, Array<Player>> = 
+        const playerSkillMapping: Map<number, Array<Player>> = 
             ContainerUtils.groupElementsByProperty<number>(players, (player: Player)=>(player.getSkillForGame(game)));
 
         // order groups descending
@@ -224,18 +221,18 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         // Create amount teams that can be fully filled
         const amountOfFullTeams: number = Math.floor(orderedPlayerArray.length / teamSize);
-        let fullTeams: Array<Team> = new Array<Team>();
+        const fullTeams: Array<Team> = new Array<Team>();
         for (let i = 1; i <= amountOfFullTeams; i++){
             fullTeams.push(new Team("Team" + i, teamSize, game));
         }
 
         // Create additional team for potential remaining players
         const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
-        let additionalTeam: Team =  new Team("Team" + (amountOfFullTeams + 1), teamSize, game); // stays empty if no remaining players
+        const additionalTeam: Team =  new Team("Team" + (amountOfFullTeams + 1), teamSize, game); // stays empty if no remaining players
 
         // Alternate between forward and backward looping over teams and add one player of ordered list at a time
-        let teamIndex: number = 0;
-        let forward: boolean = true;
+        let teamIndex = 0;
+        let forward = true;
         for (const player of orderedPlayerArray){
 
             let additionalTeamHandled: boolean = additionalTeam.currentSize === amountOfRemainingPlayers;
@@ -300,9 +297,9 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         const teamAscendingComparer = (team1: Team, team2: Team) => {return team1.getTeamGameSkill() - team2.getTeamGameSkill();};
 
-        let teamSize: number = teams[0].targetSize; // teams param must not be empty!!
+        const teamSize: number = teams[0].targetSize; // teams param must not be empty!!
         let maxSwapsLeft: number = teams.length * teams.length * (teamSize - 1); // (team size - 1) swaps per team pair.
-        let lastSwapSuccessful:boolean = true;
+        let lastSwapSuccessful = true;
 
         // optimize team balance as long as successful but at most until all swap options are exhausted
         while(lastSwapSuccessful && maxSwapsLeft > 0){
@@ -330,35 +327,35 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     protected trySwapPlayerForBetterBalance(team1: Team, team2: Team): boolean{
 
         //Step 1: Calc skill diff for given game
-        let game: Game = team1.game;
-        let teamSkill1: number = team1.getTeamGameSkill();
-        let teamSkill2: number = team2.getTeamGameSkill();
-        let teamSkillDiff: number = Math.abs(teamSkill1 - teamSkill2);
+        const game: Game = team1.game;
+        const teamSkill1: number = team1.getTeamGameSkill();
+        const teamSkill2: number = team2.getTeamGameSkill();
+        const teamSkillDiff: number = Math.abs(teamSkill1 - teamSkill2);
 
         if (teamSkillDiff <= 1) { // no better balance possible as only 1 skill point can be shifted at most
             return false; 
         }
 
         //Step 2: Check which team is better in given game
-        let higherTeam: Team = teamSkill1 > teamSkill2? team1 : team2;
-        let lowerTeam: Team = teamSkill1 < teamSkill2? team1 : team2;
+        const higherTeam: Team = teamSkill1 > teamSkill2? team1 : team2;
+        const lowerTeam: Team = teamSkill1 < teamSkill2? team1 : team2;
 
 
         //Step 3: Fetch best possible swap pairs if any, which result lower diff
-        let optimumSkillShift: number = teamSkillDiff/2;
-        let potentialSwapPairs: Array<[Player, Player]> = new Array<[Player, Player]>();
+        const optimumSkillShift: number = teamSkillDiff/2;
+        const potentialSwapPairs: Array<[Player, Player]> = new Array<[Player, Player]>();
 
         let bestDistanceToOptimum = optimumSkillShift; //full distance to optimum
         for(const playerTeamHigh of higherTeam.fixedPlayers){
             for(const playerTeamLow of lowerTeam.fixedPlayers){
 
-                let skillGainLowerTeam: number = playerTeamHigh.getSkillForGame(game) - playerTeamLow.getSkillForGame(game);
+                const skillGainLowerTeam: number = playerTeamHigh.getSkillForGame(game) - playerTeamLow.getSkillForGame(game);
 
                 if (skillGainLowerTeam <= 0 || skillGainLowerTeam >= teamSkillDiff) { 
                     continue;  // skip option if team skill difference would be increased
                 }
 
-                let distanceToOptimum: number = Math.abs(optimumSkillShift - skillGainLowerTeam);
+                const distanceToOptimum: number = Math.abs(optimumSkillShift - skillGainLowerTeam);
                 if (distanceToOptimum > bestDistanceToOptimum){
                     continue; // skip if there are already better options or swap does not optimize teams
                 }
@@ -373,8 +370,8 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
         //Step 4: If any swap possibilities, pick one randomly and return true, if not return false
         if (potentialSwapPairs.length > 0){
-            let randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (potentialSwapPairs.length - 1));
-            let [swapPlayerHigh, swapPlayerLow] = potentialSwapPairs[randomIndex];
+            const randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (potentialSwapPairs.length - 1));
+            const [swapPlayerHigh, swapPlayerLow] = potentialSwapPairs[randomIndex];
             higherTeam.removePlayer(swapPlayerHigh);
             lowerTeam.removePlayer(swapPlayerLow);
             higherTeam.addPlayer(swapPlayerLow);

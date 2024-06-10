@@ -1,6 +1,6 @@
 <template>
   <div class="mb-3">
-    <h1>This is the Editor view</h1>
+    <h1>Editor</h1>
     <p>You can add, modify and delete players and games.</p>
   </div>
   <v-row>
@@ -78,10 +78,8 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import PlayerDetail from "@/components/PlayerDetail.vue";
 import GameDetail from "@/components/GameDetail.vue";
-import TeamTile from "@/components/TeamTile.vue";
 import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 import {computed, ref} from "vue";
@@ -108,8 +106,10 @@ function clearPlayerSearch() {
 const filteredGames = computed(() => {
   return state.games.filter(item => {
     if (!gameSearch.value) return state.games;
-    return (item.name.toLowerCase().includes(gameSearch.value.toLowerCase()) ||
-        item.genre.toLowerCase().includes(gameSearch.value.toLowerCase()));
+    return (
+        item.name.toLowerCase().includes(gameSearch.value.toLowerCase()) ||
+        item.genre.toLowerCase().includes(gameSearch.value.toLowerCase())
+    );
   });
 });
 

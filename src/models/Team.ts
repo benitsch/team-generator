@@ -3,9 +3,9 @@ import type Player from "@/models/Player";
 import type Game from "@/models/Game";
 
 export default class Team {
-    private _id: string = "";
-    private _name: string = "";
-    private _targetSize: number = 0;
+    private _id = "";
+    private _name = "";
+    private _targetSize = 0;
     private _playerList: Array<Player> = [];
     private _substitutionPlayerList: Array<Player> = [];
     private _game: Game;

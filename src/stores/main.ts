@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {defineStore} from "pinia";
 import Player from "@/models/Player";
 import Game from "@/models/Game";
@@ -11,7 +10,7 @@ export const useMainStore = defineStore({
     state: () => ({
         players: [] as Array<Player>,
         games: [] as Array<Game>,
-        matches: [] as Array<TeamMatch>,
+        matches: [] as Array<typeof TeamMatch>,
         minTeamSkill: 0 as number,
         maxTeamSkill: 0 as number,
     }),

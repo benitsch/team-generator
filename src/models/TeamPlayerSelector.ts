@@ -68,14 +68,14 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
     public selectPlayers(players: Array<Player>, team: Team, minTeamSkill: number, maxTeamSkill: number): Array<Player> | SelectorErrorCode {
         
         // Step 1: Validate input 
-        let validationResult: SelectorErrorCode | undefined = this.validateSelectorInput(players, team, minTeamSkill, maxTeamSkill);
+        const validationResult: SelectorErrorCode | undefined = this.validateSelectorInput(players, team, minTeamSkill, maxTeamSkill);
         if (validationResult !== undefined){
             return validationResult;
         }
         
         // Step 2: Select random players from list
-        let amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
-        let [randomPlayerSelection, alternativePlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
+        const amountOfPlayersToAdd: number = team.targetSize - team.currentSize;
+        const [randomPlayerSelection, alternativePlayers] = this.selectRandomPlayers(players, amountOfPlayersToAdd);
 
         // Step 3: Check if team within bounds and optimize if not
         return this.optimizePlayerSelectionOutOfRange(randomPlayerSelection, alternativePlayers, team, minTeamSkill, maxTeamSkill);
@@ -121,7 +121,7 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
         //--> playerlist must not contain team members
         for (const teamPlayer of team.allPlayers){
-            let match: Player | undefined = players.find(element => element === teamPlayer);
+            const match: Player | undefined = players.find(element => element === teamPlayer);
             if (match !== undefined){
                 return SelectorErrorCode.PlayerListContainsTeamMembers;
             }
@@ -152,13 +152,13 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
      * @returns An array of randomly selected players.
      */
     protected selectRandomPlayers(players: Array<Player>, amount: number): [Array<Player>, Array<Player>] {
-        let randomPlayers: Array<Player> = players;
+        const randomPlayers: Array<Player> = players;
         let playersToRemove: number = randomPlayers.length > amount? randomPlayers.length - amount : 0;
-        let remainingPlayers: Array<Player> = new Array<Player>();
+        const remainingPlayers: Array<Player> = new Array<Player>();
 
         while (playersToRemove > 0){
-            let randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (randomPlayers.length - 1));
-            let removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0);
+            const randomIndex: number = Math.floor(this.randomSource.getRandomNumber() * (randomPlayers.length - 1));
+            const removedPlayer: Player | undefined = randomPlayers.splice(randomIndex, 1).at(0);
             if (removedPlayer !== undefined){
                 remainingPlayers.push(removedPlayer);
             }
@@ -198,11 +198,11 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
         }
 
         // determine optimum team skill as reference for best swap selection
-        let optimumTeamSkill: number = Math.abs(maxTeamSkill - minTeamSkill) / 2;
+        const optimumTeamSkill: number = Math.abs(maxTeamSkill - minTeamSkill) / 2;
 
         // swap current selection players with alternatives until teamskill is in range
         // or swap if teamskill improves towards optimum (best we can do even if not in given skill range)
-        let optimizedSelection: Array<Player> = currentPlayerSelection;
+        const optimizedSelection: Array<Player> = currentPlayerSelection;
         for (const alternativePlayer of alternativePlayers){
 
             // keep track of best possible swap selection if alternative does not allow team to get in range
@@ -211,13 +211,13 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
             for (const player of optimizedSelection){
 
-                let teamSkillOnSwap: number = totalTeamSkill - player.getSkillForGame(team.game) + alternativePlayer.getSkillForGame(team.game);
+                const teamSkillOnSwap: number = totalTeamSkill - player.getSkillForGame(team.game) + alternativePlayer.getSkillForGame(team.game);
 
                 // CASE 1: 
                 // check if swap would already move team skill within range between min and max
                 // stop here if it does and return the improved selection
                 if(minTeamSkill <= teamSkillOnSwap && teamSkillOnSwap <= maxTeamSkill){
-                    let playerIndexToRemove: number = optimizedSelection.indexOf(player);
+                    const playerIndexToRemove: number = optimizedSelection.indexOf(player);
                     optimizedSelection.splice(playerIndexToRemove, 1);
                     optimizedSelection.push(alternativePlayer);
                     return optimizedSelection;
@@ -226,7 +226,7 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
                 // CASE 2:
                 // alternative does not move team already in range, let's check if alternative would
                 // at least improve team towards optimum and update current best swap option
-                let distanceToOptimum: number = Math.abs(teamSkillOnSwap - optimumTeamSkill);
+                const distanceToOptimum: number = Math.abs(teamSkillOnSwap - optimumTeamSkill);
                 if (bestDistanceToOptimum > distanceToOptimum){
                     bestDistanceToOptimum = distanceToOptimum;
                     potentialSwapPlayer = player;
@@ -235,7 +235,7 @@ export default class OptimalTeamPlayerSelector implements TeamPlayerSelector {
 
             // apply current best swap option if any and continue with next alternative
             if (potentialSwapPlayer != undefined){
-                let playerIndexToRemove: number = optimizedSelection.indexOf(potentialSwapPlayer);
+                const playerIndexToRemove: number = optimizedSelection.indexOf(potentialSwapPlayer);
                     optimizedSelection.splice(playerIndexToRemove, 1);
                     optimizedSelection.push(alternativePlayer);
                     totalTeamSkill = totalTeamSkill - potentialSwapPlayer.getSkillForGame(team.game) + alternativePlayer.getSkillForGame(team.game);

@@ -48,8 +48,8 @@ import Game from "@/models/Game";
 const emit = defineEmits(["saveGame", "cancelGame", "deleteGame", "cancelDialog"]);
 const props = defineProps({
   gameDetail: {
-    type: Game,
-    // default: null
+    type: Object as () => Game | null | undefined,
+    default: null
   }
 });
 
@@ -58,7 +58,7 @@ const isEdit = computed(() => {
 });
 
 const form = ref();
-const title = ref<string>(isEdit.value ? "Edit game" : "Add new game");
+const title = isEdit.value ? "Edit game" : "Add new game";
 
 const game = ref<Game>(new Game());
 game.value.name = props.gameDetail?.name ?? "";
