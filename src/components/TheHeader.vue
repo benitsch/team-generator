@@ -11,21 +11,15 @@
   </v-app-bar>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'TheHeader',
-  data() {
-    return {
-      routes: this.$router.options.routes
-    }
-  },
-}
+<script setup lang="ts">
+  import router from '@/router';
+
+  const routes = router.options.routes;
 </script>
 
 <style scoped>
   .lancraft-title {
-    font-family: "LifeCraft", sans-serif;
+    font-family: 'LifeCraft', sans-serif;
     font-size: 2rem;
   }
-
 </style>

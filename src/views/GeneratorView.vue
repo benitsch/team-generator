@@ -4,13 +4,6 @@
   <TournamentGenerator></TournamentGenerator>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue";
-import TournamentGenerator from "@/components/TournamentGenerator.vue";
-
-export default defineComponent({
-  components: {TournamentGenerator}
-})
+<script setup lang="ts">
+  import TournamentGenerator from '@/components/TournamentGenerator.vue';
 </script>
-
-<style scoped></style>

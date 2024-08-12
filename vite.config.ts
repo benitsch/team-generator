@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
@@ -12,8 +13,11 @@ export default defineConfig({
     },
   },
   test: {
+    include: ['**/*.spec.ts'],
+    environment: 'jsdom',
     coverage: {
-      provider: 'v8' // or 'istanbul'
+      provider: 'v8', // or 'istanbul'
+      reportsDirectory: 'tests/coverage'
     },
   },
 });

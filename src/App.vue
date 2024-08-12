@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import TheHeader from "./components/TheHeader.vue";
-import TheFooter from "./components/TheFooter.vue";
+  import TheHeader from './components/TheHeader.vue';
+  import TheFooter from './components/TheFooter.vue';
 </script>
 
 <template>
@@ -16,9 +16,10 @@ import TheFooter from "./components/TheFooter.vue";
 </template>
 
 <style>
-@font-face {
-  font-family: "LifeCraft";
-  src: local("LifeCraft"),
-  url(/fonts/LifeCraft_Font.ttf) format("truetype");
-}
+  @font-face {
+    font-family: 'LifeCraft';
+    src:
+      local('LifeCraft'),
+      url(/fonts/LifeCraft_Font.ttf) format('truetype');
+  }
 </style>
