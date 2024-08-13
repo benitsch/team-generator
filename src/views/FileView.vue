@@ -84,7 +84,8 @@
    * The content of the uploaded json file is set to the Pinia status data to have all players and games.
    */
   function uploadJson(): void {
-    const file = uploadedFile.value[0] as File;
+    const file = uploadedFile.value as File;
+
     if (!file) return;
 
     if (!file.name.endsWith('.json')) {
