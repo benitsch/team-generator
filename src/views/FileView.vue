@@ -1,6 +1,6 @@
 <template>
   <div class="mb-3">
-    <h1>This is the File view</h1>
+    <h1>File</h1>
     <p>You can upload and download the setup as JSON file.</p>
   </div>
   <v-row>

@@ -1,13 +1,13 @@
 <template>
   <div class="mb-3">
-    <h1>This is the Editor view</h1>
+    <h1>Editor</h1>
     <p>You can add, modify and delete players and games.</p>
   </div>
   <v-row>
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title class="d-flex">
-          Player
+          Players
           <v-spacer></v-spacer>
           <v-btn
             size="small"

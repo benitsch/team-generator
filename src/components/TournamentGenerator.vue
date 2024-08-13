@@ -28,20 +28,6 @@
 
             <v-divider class="mt-2"></v-divider>
           </template>
-<!--          <template #selection="{ item, index }">-->
-<!--            <span>{{ item.title }}</span>-->
-<!--          </template>-->
-<!--          <template #selection="{ item, index }">-->
-<!--            <v-chip v-if="index < 2">-->
-<!--              <span>{{ item.title }}</span>-->
-<!--            </v-chip>-->
-<!--            <span-->
-<!--              v-if="index === 2"-->
-<!--              class="text-grey text-caption align-self-center"-->
-<!--            >-->
-<!--        (+{{ value.length - 2 }} others)-->
-<!--      </span>-->
-<!--          </template>-->
         </v-select>
         <v-select
           v-model="selectedGameId"
@@ -146,7 +132,9 @@
     if (allParticipantsSelected()) {
       selectedParticipants.value.splice(0);
     } else {
-      selectedParticipants.value = [...state.players.map((player) => player.id)];
+      selectedParticipants.value = [
+        ...state.players.map((player) => player.id),
+      ];
     }
   }
 
