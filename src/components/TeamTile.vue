@@ -6,7 +6,7 @@
           <h3 class="team-name">{{ team.name }}</h3>
 
           <v-menu v-model="menu" :close-on-content-click="false" location="end">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <v-btn icon density="compact" class="add-player" v-bind="props">
                 <v-icon size="15">mdi-account-edit</v-icon>
               </v-btn>
@@ -17,7 +17,7 @@
                 <v-list-item
                   :title="addSubplayer ? 'Add Subplayer' : 'Add Player'"
                 >
-                  <template v-slot:append>
+                  <template #append>
                     <v-btn
                       variant="text"
                       :icon="

@@ -11,25 +11,37 @@
           item-value="id"
           item-title="tag"
         >
-          <!--          <template v-slot:prepend-item>-->
-          <!--            <v-list-item-->
-          <!--                title="Select All"-->
-          <!--                @click="toggleSelectAll"-->
-          <!--            >-->
-          <!--              <template v-slot:prepend>-->
-          <!--                <v-checkbox-btn-->
-          <!--                    :color="someParticipantsSelected() ? 'indigo-darken-4' : undefined"-->
-          <!--                    :indeterminate="someParticipantsSelected() && !allParticipantsSelected()"-->
-          <!--                    :model-value="someParticipantsSelected()"-->
-          <!--                ></v-checkbox-btn>-->
-          <!--              </template>-->
-          <!--            </v-list-item>-->
+          <template #prepend-item>
+            <v-list-item title="Select All" @click="toggleSelectAll">
+              <template #prepend>
+                <v-checkbox-btn
+                  :color="
+                    someParticipantsSelected() ? 'indigo-darken-4' : undefined
+                  "
+                  :indeterminate="
+                    someParticipantsSelected() && !allParticipantsSelected()
+                  "
+                  :model-value="allParticipantsSelected()"
+                ></v-checkbox-btn>
+              </template>
+            </v-list-item>
 
-          <!--            <v-divider class="mt-2"></v-divider>-->
-          <!--          </template>-->
-          <!--          <template v-slot:selection="{ item }">-->
-          <!--            <span>{{ item.title }}</span>-->
-          <!--          </template>-->
+            <v-divider class="mt-2"></v-divider>
+          </template>
+<!--          <template #selection="{ item, index }">-->
+<!--            <span>{{ item.title }}</span>-->
+<!--          </template>-->
+<!--          <template #selection="{ item, index }">-->
+<!--            <v-chip v-if="index < 2">-->
+<!--              <span>{{ item.title }}</span>-->
+<!--            </v-chip>-->
+<!--            <span-->
+<!--              v-if="index === 2"-->
+<!--              class="text-grey text-caption align-self-center"-->
+<!--            >-->
+<!--        (+{{ value.length - 2 }} others)-->
+<!--      </span>-->
+<!--          </template>-->
         </v-select>
         <v-select
           v-model="selectedGameId"
@@ -69,8 +81,8 @@
       timeout="5000"
       min-width="0"
       close-on-content-click
-      >{{ errorMessage }}</v-snackbar
-    >
+      >{{ errorMessage }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -90,7 +102,7 @@
 
   const state = useMainStore();
 
-  const selectedParticipants = ref([]);
+  const selectedParticipants = ref<string[]>([]);
   const selectedGameId = ref();
   const teamSize = ref();
   const possibleTeamSizes = [2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -122,23 +134,21 @@
     generatedTeamsAsMatchPair();
   }
 
-  // TODO implement "Select All" feature in v-select for participants (player)
-  // function allParticipantsSelected() {
-  //   return selectedParticipants.value.length === state.players.length;
-  // }
-  //
-  // function someParticipantsSelected() {
-  //   return selectedParticipants.value.length > 0;
-  // }
-  //
-  // function toggleSelectAll() {
-  //   if (allParticipantsSelected()) {
-  //     selectedParticipants.value.splice(0);
-  //   } else {
-  //     selectedParticipants.value.splice(0);
-  //     selectedParticipants.value.push(...state.players.map(player => player.tag));
-  //   }
-  // }
+  function allParticipantsSelected(): boolean {
+    return selectedParticipants.value.length === state.players.length;
+  }
+
+  function someParticipantsSelected(): boolean {
+    return selectedParticipants.value.length > 0;
+  }
+
+  function toggleSelectAll(): void {
+    if (allParticipantsSelected()) {
+      selectedParticipants.value.splice(0);
+    } else {
+      selectedParticipants.value = [...state.players.map((player) => player.id)];
+    }
+  }
 
   function getPlayerById(playerIds: string[]): Player[] {
     return state.players.filter((player) =>
