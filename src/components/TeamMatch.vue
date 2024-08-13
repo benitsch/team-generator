@@ -1,16 +1,16 @@
 <template>
   <div class="team-match__container d-flex align-center mr-8 mt-5">
     <TeamTile
-      :team="match.team"
-      :opposite-team="match.oppositeTeam"
-      :game="game"
+      :team="props.match.team"
+      :opposite-team="props.match.oppositeTeam"
+      :game="props.game"
     ></TeamTile>
-    <template v-if="match.oppositeTeam != null">
+    <template v-if="props.match.oppositeTeam != null">
       <hr />
       <TeamTile
-        :team="match.oppositeTeam"
-        :opposite-team="match.team"
-        :game="game"
+        :team="props.match.oppositeTeam"
+        :opposite-team="props.match.team"
+        :game="props.game"
       ></TeamTile>
     </template>
   </div>
@@ -33,9 +33,6 @@
       required: true,
     },
   });
-
-  const match = props.match;
-  const game = props.game;
 </script>
 
 <style scoped>

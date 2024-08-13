@@ -11,7 +11,7 @@
           size="small"
           icon="mdi-delete"
           title="Delete Game"
-          @click="emit('deleteGame')"
+          @click="$emit('deleteGame')"
         ></v-btn>
       </v-card-title>
       <v-card-text>
@@ -34,7 +34,7 @@
           elevation="2"
           color="red darken-1"
           text="Cancel"
-          @click="emit('cancelDialog')"
+          @click="$emit('cancelDialog')"
         >
         </v-btn>
         <v-btn elevation="2" color="green darken-1" @click="submit">
@@ -49,12 +49,7 @@
   import { ref, computed } from 'vue';
   import Game from '@/models/Game';
 
-  const emit = defineEmits([
-    'saveGame',
-    'cancelGame',
-    'deleteGame',
-    'cancelDialog',
-  ]);
+  const emit = defineEmits(['saveGame', 'deleteGame', 'cancelDialog']);
 
   const props = defineProps({
     gameDetail: Game || null,
@@ -84,5 +79,3 @@
 
   // TODO(bn) next to game name required rule, also a check if name already exist in games array;
 </script>
-
-<style scoped></style>

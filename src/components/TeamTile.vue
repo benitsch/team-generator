@@ -164,7 +164,7 @@
   import Game from '@/models/Game';
   import OptimalTeamPlayerSelector from '@/models/TeamPlayerSelector';
 
-  // ((x as any) as XXX) issue: https://github.com/vuejs/core/issues/3815
+  // ((x as any) as XXX) because of issue: https://github.com/vuejs/core/issues/3815
 
   const props = defineProps({
     team: {

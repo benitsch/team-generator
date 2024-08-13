@@ -11,7 +11,7 @@
           size="small"
           icon="mdi-delete"
           title="Delete Player"
-          @click="emit('deletePlayer')"
+          @click="$emit('deletePlayer')"
         ></v-btn>
       </v-card-title>
       <v-divider></v-divider>
@@ -56,7 +56,7 @@
           elevation="2"
           color="red darken-1"
           text="Cancel"
-          @click="emit('cancelDialog')"
+          @click="$emit('cancelDialog')"
         >
         </v-btn>
         <v-btn elevation="2" color="green darken-1" @click="submit">
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, type Ref } from 'vue';
   import Player from '@/models/Player';
   import { useMainStore } from '@/stores/main';
   import GameSkill from '@/models/GameSkill';
@@ -76,16 +76,10 @@
 
   const state = useMainStore();
 
-  const emit = defineEmits([
-    'savePlayer',
-    'cancelPlayer',
-    'deletePlayer',
-    'cancelDialog',
-  ]);
+  const emit = defineEmits(['savePlayer', 'deletePlayer', 'cancelDialog']);
+
   const props = defineProps({
-    playerDetail: {
-      type: Player || null,
-    },
+    playerDetail: Player || null,
   });
 
   const isEdit = computed(() => {
@@ -93,7 +87,9 @@
   });
 
   const form = ref();
-  const title = ref<string>(isEdit.value ? 'Edit player' : 'Add new player');
+  const title: Ref<string> = ref(
+    isEdit.value ? 'Edit player' : 'Add new player',
+  );
 
   const player = ref<Player>(
     new Player(
@@ -142,5 +138,3 @@
   // TODO(bn) next to player tag required rule, also a check if tag already exist in player array;
   ensureGameSkills();
 </script>
-
-<style scoped></style>
