@@ -4,6 +4,13 @@
       <v-card-title>Create a tournament</v-card-title>
       <v-card-text>
         <v-select
+          v-model="selectedGameId"
+          :items="state.games"
+          item-title="name"
+          item-value="id"
+          label="Game"
+        ></v-select>
+        <v-select
           v-model="selectedParticipants"
           :items="state.players"
           label="Player"
@@ -30,15 +37,8 @@
           </template>
         </v-select>
         <v-select
-          v-model="selectedGameId"
-          :items="state.games"
-          item-title="name"
-          item-value="id"
-          label="Game"
-        ></v-select>
-        <v-select
           v-model="teamSize"
-          :items="possibleTeamSizes"
+          :items="possibleTeamSizeOptions"
           label="Team size"
         ></v-select>
       </v-card-text>
@@ -46,6 +46,7 @@
         <v-btn
           elevation="2"
           prepend-icon="mdi-tournament"
+          :disabled="disableGenerateTeamsBtn"
           @click="generateTeams"
         >
           Generate
@@ -75,7 +76,7 @@
 <script setup lang="ts">
   // This component has multiple TeamMatch components to create a tournament tree.
 
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import TeamMatch from '@/components/TeamMatch.vue';
   import { useMainStore } from '@/stores/main';
   import BalancedRandomTeamGenerator, {
@@ -88,10 +89,10 @@
 
   const state = useMainStore();
 
+  const selectedGameId = ref<string>();
   const selectedParticipants = ref<string[]>([]);
-  const selectedGameId = ref();
   const teamSize = ref();
-  const possibleTeamSizes = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const possibleTeamSizeOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const generatedTeams = ref<Team[]>([]);
   const generatedMatches = ref<Match[]>(state.matches as Match[]);
@@ -194,4 +195,8 @@
     state.maxTeamSkill = Math.max(...teamSkills);
     state.minTeamSkill = Math.min(...teamSkills);
   }
+
+  const disableGenerateTeamsBtn = computed(() => {
+    return selectedGameId.value === undefined || selectedParticipants.value.length === 0 || teamSize.value === undefined
+  });
 </script>
