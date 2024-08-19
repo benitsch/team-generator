@@ -99,10 +99,10 @@
           </v-menu>
         </v-row>
         <v-row no-gutters>
-          <v-col class="players-list">
+          <v-col class="players-list" cols="6">
             <template v-for="player in team.fixedPlayers" :key="player.id">
               <div class="d-flex name-container">
-                <p class="player-name" :title="getPlayerTitleAttr(player)">
+                <p class="player-name truncate" :title="getPlayerTitleAttr(player)">
                   {{ player.tag }}
                 </p>
                 <v-icon class="delete-player" @click="removePlayer(player)"
@@ -111,13 +111,13 @@
               </div>
             </template>
           </v-col>
-          <v-col class="sub-player-list">
+          <v-col class="sub-player-list" cols="6">
             <template
               v-for="subPlayer in team.substitutionPlayers"
               :key="subPlayer.id"
             >
               <div class="d-flex name-container">
-                <p :title="getPlayerTitleAttr(subPlayer)">
+                <p class="truncate" :title="getPlayerTitleAttr(subPlayer)">
                   {{ subPlayer.tag }}
                 </p>
                 <v-icon class="delete-player" @click="removePlayer(subPlayer)"
@@ -336,5 +336,10 @@
   .player-name {
     font-weight: bold;
     user-select: none;
+  }
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

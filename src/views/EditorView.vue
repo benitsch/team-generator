@@ -51,7 +51,7 @@
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title class="d-flex">
-          Games
+          Games&nbsp;({{ state.games.length }})
           <v-spacer></v-spacer>
           <v-btn
             size="small"
