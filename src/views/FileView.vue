@@ -7,8 +7,6 @@
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title>Upload a JSON file</v-card-title>
-        <v-card-subtitle>Sub Title</v-card-subtitle>
-        <v-card-text>This ist the text</v-card-text>
         <v-card-actions class="justify-end">
           <v-file-input
             v-model="uploadedFile"
@@ -23,7 +21,6 @@
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title>Download as JSON file</v-card-title>
-        <v-card-subtitle>Sub Title</v-card-subtitle>
         <v-card-text>
           <code class="pa-3 rounded-sm jsonCode" v-text="jsonContent"></code>
         </v-card-text>

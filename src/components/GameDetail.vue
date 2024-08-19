@@ -1,6 +1,6 @@
 <template>
-  <v-form ref="form">
-    <v-card min-width="250px">
+  <v-form ref="form" class="align-center">
+    <v-card min-width="350px">
       <v-card-title class="d-flex">
         {{ title }}
         <v-spacer></v-spacer>
