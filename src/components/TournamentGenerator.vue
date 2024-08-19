@@ -5,18 +5,24 @@
       <v-card-text>
         <v-select
           v-model="selectedGameId"
+          class="mb-4"
           :items="state.games"
           item-title="name"
           item-value="id"
           label="Game"
+          :hint="`Total number of Games: ${state.games.length}`"
+          persistent-hint
         ></v-select>
         <v-select
           v-model="selectedParticipants"
+          class="mb-4"
           :items="state.players"
           label="Player"
           multiple
           item-value="id"
           item-title="tag"
+          :hint="`Total number of Players: ${state.players.length}`"
+          persistent-hint
         >
           <template #prepend-item>
             <v-list-item title="Select All" @click="toggleSelectAll">

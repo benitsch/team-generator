@@ -7,7 +7,7 @@
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title class="d-flex">
-          Players
+          Players&nbsp;({{ state.players.length }})
           <v-spacer></v-spacer>
           <v-btn
             size="small"
