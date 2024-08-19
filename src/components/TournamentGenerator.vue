@@ -16,12 +16,12 @@
         <v-select
           v-model="selectedParticipants"
           class="mb-4"
-          :items="state.players"
+          :items="filterPlayersByGame"
           label="Player"
           multiple
           item-value="id"
           item-title="tag"
-          :hint="`Total number of Players: ${state.players.length}`"
+          :hint="`Total number of Players: ${filterPlayersByGame.length}`"
           persistent-hint
         >
           <template #prepend-item>
@@ -82,7 +82,7 @@
 <script setup lang="ts">
   // This component has multiple TeamMatch components to create a tournament tree.
 
-  import { computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import TeamMatch from '@/components/TeamMatch.vue';
   import { useMainStore } from '@/stores/main';
   import BalancedRandomTeamGenerator, {
@@ -128,7 +128,7 @@
   }
 
   function allParticipantsSelected(): boolean {
-    return selectedParticipants.value.length === state.players.length;
+    return selectedParticipants.value.length === filterPlayersByGame.value.length;
   }
 
   function someParticipantsSelected(): boolean {
@@ -140,7 +140,7 @@
       selectedParticipants.value.splice(0);
     } else {
       selectedParticipants.value = [
-        ...state.players.map((player) => player.id),
+        ...filterPlayersByGame.value.map((player) => player.id),
       ];
     }
   }
@@ -204,5 +204,16 @@
 
   const disableGenerateTeamsBtn = computed(() => {
     return selectedGameId.value === undefined || selectedParticipants.value.length === 0 || teamSize.value === undefined
+  });
+
+  const filterPlayersByGame = computed(() => {
+    return state.players.filter((player) => {
+      const selectedGame = player.gameSkills.find((game) => game.game.id === selectedGameId.value);
+      return selectedGame && selectedGame.skillLevel > 0;
+    });
+  });
+
+  watch(selectedGameId, () => {
+    selectedParticipants.value.splice(0);
   });
 </script>
