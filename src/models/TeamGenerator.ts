@@ -96,11 +96,10 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    *
    * Sort teams by their skill.
    *
-   * Repeat optimization step N^2 * T^2 times or until no further optimization can be achieved.
+   * Repeat optimization until no further optimization can be achieved.
    *
-   *  --> Compare best and worst team and if there's a skill diff then swap the best possible player pair (choose random if several options).
+   *  --> Compare any team with any and if there's a skill diff then swap the best possible player pair (choose random if several options).
    *
-   *  --> Sort teams again if optimization could be achieved for current team pair
    *
    *
    *
