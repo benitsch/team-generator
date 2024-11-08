@@ -369,28 +369,40 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    * @param teams The teams for which to optimize their balance
    */
   protected optimizeTeamSkillBalance(teams: Array<Team>): void {
-    const teamAscendingComparer = (team1: Team, team2: Team): number => {
-      return team1.getTeamGameSkill() - team2.getTeamGameSkill();
-    };
+    if (teams.length < 2){
+      return;
+    }
 
-    const teamSize: number = teams[0].targetSize; // teams param must not be empty!!
-    let maxSwapsLeft: number = teams.length * teams.length * teamSize * teamSize; // an upper limit for swaps as safeguard (swapping every member in every team with every member of every other team)
     let lastSwapSuccessful: boolean = true;
 
-    // optimize team balance as long as successful but at most until all swap options are exhausted
-    while (lastSwapSuccessful && maxSwapsLeft > 0) {
-      teams.sort(teamAscendingComparer);
-      // try to swap one player between best and worst team:
-      lastSwapSuccessful = this.trySwapPlayerForBetterBalance(
-        teams[0],
-        teams[teams.length - 1],
-      );
-      maxSwapsLeft--;
+    // optimize team balance as long as successful. Will eventually stop as no swapping improvement possible anymore.
+    while (lastSwapSuccessful) {
+
+      lastSwapSuccessful = false; // safeguard to terminate while loop.
+      for (let teamA of teams){
+        for (let teamB of teams){
+          if (teamA !== teamB){// try to swap one player between two different teams
+            lastSwapSuccessful = this.trySwapPlayerForBetterBalance(
+              teamA,
+              teamB,
+            );
+          }
+          if (lastSwapSuccessful){break;} // break for outer while loop on success. 
+          // if not breaking then possible optimization could be overseen when exiting for loops with last attempt == false.
+        }
+        if (lastSwapSuccessful){break;} // break for outer while loop on success.
+      }
     }
   }
 
+  protected filterBySkill(teams: Array<Team>, skill: number): Array<Team> {
+
+
+    return teams;
+  }
+
   /**
-   * This function is a protected subroutine call which takes 2 full teams and 1 game as input
+   * This function is a protected subroutine call which takes 2 full teams for a certain game as input
    * and tries to swap 1 player pair if applicable to decrease the skill diff of the given teams
    * as much as possible. If several options with the same result are available then a random
    * pair out of the options is chosen.
