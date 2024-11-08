@@ -354,14 +354,13 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
   /**
    * This function takes a list of teams and optimizes the balancing between them.
-   * This is done by sorting the teams from best to worst and iteratively try to
-   * swap 1 optimum player pair of the best and worst team and reshuffle the team
-   * array.
+   * This is done by iteratively try to swap 1 optimum player pair between any team combination
+   * until there's no more improvment possible.
    *
    * The single player swap is based on a greedy approach (local optimum) but since
    * only one optimum player is swapped and not the whole team composition between
-   * best and worst team this optimization algorithm may aim for a global balance
-   * optimum over all teams (to be verified).
+   * any two teams this aims for a more global optimum. Especially since now any team
+   * combination is compared instead of best and worst.
    *
    * Again this function assumes validation has been done to assure that all players
    * within the team have their game skill assessed for the given game!!!!
