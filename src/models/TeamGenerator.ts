@@ -87,7 +87,8 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    * team2 [9,5,4]  --> team skill = 18
    * team3 [7,6,4]  --> team skill = 17
    *
-   * In some cases this already suffices for optimum balance between teams.
+   * In some cases this already suffices for optimum balance between teams and might increase the performance of the next optimization step
+   * as the teams are already pre-balanced. Alternatively teams can also have players randomly assigned and then optimized.
    * To ensure optimization on higher team skill differences there will be a refinement step at the end.
    * This refinement sorts teams by their teams skill and tries to swap team member between best and worst team to reach optimum:
    *
@@ -120,28 +121,24 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
       return paramCheckResult;
     }
 
-    //Step 2: order players by their skill descending and shuffle players with same skill in array
-    const orderedPlayerArray: Array<Player> =
-      this.orderPlayersDescendingByGameSkill(players, game);
-
-    //Step 3: create X full teams and one additional team with remaining players if any
-    const [fullTeams, additionalTeam] = this.assignPlayersToTeams(
-      orderedPlayerArray,
+    //Step 2: create X full teams and one additional team with remaining players if any
+    const [fullTeams, additionalTeam] = this.assignPlayersToTeamsBalanced(
+      players,
       teamSize,
       game,
     );
 
-    //Step 4: Refine team balance (swap players between best and worst team if possible)
+    //Step 3: Refine team balance (swap players between best and worst team if possible)
     // fill up additional team with fake substitution player of avg skill for refinement step, remove afterwards
     // add additional team only if it holds remaining fixed players.
     this.optimizeTeamSkillBalance(fullTeams);
 
-    //Step 5: Add additional team if it holds any players (this is the team that would need additional players to fill up)
+    //Step 4: Add additional team if it holds any players (this is the team that would need additional players to fill up)
     if (additionalTeam.fixedPlayers.length > 0) {
       fullTeams.push(additionalTeam);
     }
 
-    // shuffle order of teams (useful for opponent setup: 1. vs 2., 3. vs 4., ....)
+    //Step 5: Shuffle order of teams (useful for opponent setup: 1. vs 2., 3. vs 4., ....)
     ContainerUtils.shuffleArray(fullTeams);
     return fullTeams;
   }
@@ -222,32 +219,75 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
   }
 
   /**
-   * This function takes a list of players (ideally ordered by their game skill for balance reasons), the
-   * requested team size and the game for which the players shall be teamed up. The result consists of 2
-   * elements:
+   * This function takes a list of players, the requested team size and the game for which the players shall be 
+   * teamed up. The result consists of 2 elements:
    * 1) An array of teams which are filled up to the requested team size
    * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
    *    But this extra team was also involved in balancing so it does not containt best or worst players only.
    *
-   * If the given player list is not ordered by the players game skill this function will still return the
-   * mentioned results but balancing is not guaranteed. Balancing is achieved by assigning one player after
-   * another of the ordered player list to the teams alternating between first and last team to start with
-   * in each iteration.
+   * The given player list will first be ordered by their skill in descending order. Balancing is achieved by 
+   * assigning one player after another of the ordered player list to the teams alternating between first and last 
+   * team to start with in each iteration.
    *
    *
-   * @param orderedPlayerArray The player list which is descending ordered by their game skill
+   * @param playerArray The player list to assign to teams.
    * @param teamSize The size of the teams to be created
-   * @param game The game on which the ordering of the incoming player list is based on (needed to calc avg player skill)
+   * @param game The game on which the teams are created for.
+   * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
+   */
+  protected assignPlayersToTeamsBalanced(playerArray: Array<Player>,
+    teamSize: number,
+    game: Game,
+  ): [Team[], Team] {
+    const orderedPlayerArray: Array<Player> =
+      this.orderPlayersDescendingByGameSkill(playerArray, game);
+
+    return this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
+  }
+
+    /**
+   * This function takes a list of players, the requested team size and the game for which the players shall be 
+   * teamed up. The result consists of 2 elements:
+   * 1) An array of teams which are filled up to the requested team size
+   * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
+   *    But this extra team was also involved in balancing so it does not containt best or worst players only.
+   *
+   * The given player list will first be randomly shuffeled. Then players are added to teams alternating between first 
+   * and last team to start with in each iteration.
+   *
+   *
+   * @param playerArray The player list to assign to teams.
+   * @param teamSize The size of the teams to be created
+   * @param game The game on which the teams are created for.
+   * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
+   */
+    protected assignPlayersToTeamsRandom(playerArray: Array<Player>,
+      teamSize: number,
+      game: Game,
+    ): [Team[], Team] {
+      ContainerUtils.shuffleArray(playerArray);
+      return this.assignPlayersToTeams(playerArray, teamSize, game);
+    }
+
+
+  /**
+   * This function takes a list of players, team size and game to create teams by adding players to teams alternating between 
+   * first and last team to start with in each iteration. (This is a precondition for pre-balancing). If the give player list is
+   * already ordered by skill then this assignment method will allow for pre-balanced teams as output.
+   * 
+   * @param playerArray The player list to assign to teams.
+   * @param teamSize The size of the teams to be created.
+   * @param game The game which the teams are created for.
    * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
    */
   protected assignPlayersToTeams(
-    orderedPlayerArray: Array<Player>,
+    playerArray: Array<Player>,
     teamSize: number,
     game: Game,
   ): [Team[], Team] {
     // Create amount teams that can be fully filled
     const amountOfFullTeams: number = Math.floor(
-      orderedPlayerArray.length / teamSize,
+      playerArray.length / teamSize,
     );
     const fullTeams: Array<Team> = new Array<Team>();
     for (let i = 1; i <= amountOfFullTeams; i++) {
@@ -255,7 +295,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     }
 
     // Create additional team for potential remaining players
-    const amountOfRemainingPlayers = orderedPlayerArray.length % teamSize;
+    const amountOfRemainingPlayers = playerArray.length % teamSize;
     const additionalTeam: Team = new Team(
       'Team' + (amountOfFullTeams + 1),
       teamSize,
@@ -265,7 +305,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     // Alternate between forward and backward looping over teams and add one player of ordered list at a time
     let teamIndex: number = 0;
     let forward: boolean = true;
-    for (const player of orderedPlayerArray) {
+    for (const player of playerArray) {
       let additionalTeamHandled: boolean =
         additionalTeam.currentSize === amountOfRemainingPlayers;
 
