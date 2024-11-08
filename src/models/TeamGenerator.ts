@@ -95,7 +95,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    *
    * Sort teams by their skill.
    *
-   * Repeat optimization step N^2 * (T-1) times or until no further optimization can be achieved.
+   * Repeat optimization step N^2 * T^2 times or until no further optimization can be achieved.
    *
    *  --> Compare best and worst team and if there's a skill diff then swap the best possible player pair (choose random if several options).
    *
@@ -334,7 +334,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     };
 
     const teamSize: number = teams[0].targetSize; // teams param must not be empty!!
-    let maxSwapsLeft: number = teams.length * teams.length * (teamSize - 1); // (team size - 1) swaps per team pair.
+    let maxSwapsLeft: number = teams.length * teams.length * teamSize * teamSize; // an upper limit for swaps as safeguard (swapping every member in every team with every member of every other team)
     let lastSwapSuccessful: boolean = true;
 
     // optimize team balance as long as successful but at most until all swap options are exhausted
