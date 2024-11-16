@@ -121,6 +121,8 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     }
 
     //Step 2: create X full teams and one additional team with remaining players if any
+    // This step is already pre balancing teams which provides better optimization results
+    // than using a random assembly of teams.
     const [fullTeams, additionalTeam] = this.assignPlayersToTeamsBalanced(
       players,
       teamSize,
