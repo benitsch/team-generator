@@ -395,12 +395,6 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     }
   }
 
-  protected filterBySkill(teams: Array<Team>, skill: number): Array<Team> {
-
-
-    return teams;
-  }
-
   /**
    * This function is a protected subroutine call which takes 2 full teams for a certain game as input
    * and tries to swap 1 player pair if applicable to decrease the skill diff of the given teams
