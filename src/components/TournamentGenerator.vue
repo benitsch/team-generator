@@ -21,7 +21,7 @@
           multiple
           item-value="id"
           item-title="tag"
-          :hint="`Total number of Players: ${filterPlayersByGame.length}`"
+          :hint="`Total number of Players: ${selectedParticipants.length}/${filterPlayersByGame.length}`"
           persistent-hint
         >
           <template #prepend-item>
