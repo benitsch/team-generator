@@ -98,7 +98,19 @@
       props.playerDetail?.lastName ?? '',
     ),
   );
-  player.value.gameSkills = props.playerDetail?.gameSkills ?? [];
+
+  if (props.playerDetail?.gameSkills) {
+    const gameSkills: GameSkill[] = [];
+
+    props.playerDetail.gameSkills.forEach(gs => {
+      const gameSkill: GameSkill = new GameSkill(gs.game, gs.skillLevel);
+      gameSkill.id = gs.id;
+      gameSkills.push(gameSkill);
+    });
+    player.value.gameSkills = gameSkills;
+  } else {
+    player.value.gameSkills = [];
+  }
 
   const gameTickLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
