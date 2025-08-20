@@ -96,7 +96,7 @@
     reader.onload = (): void => {
       try {
         state.setStateFromJson(reader.result as string);
-      } catch (error) {
+      } catch {
         uploadedFile.value = null;
         alert('Invalid JSON file.');
       }

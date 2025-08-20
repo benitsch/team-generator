@@ -213,7 +213,7 @@ describe('Team properties tests.', () => {
 
     team.addPlayer(player1);
     team.addPlayer(player2);
-    expect(team.getTeamGameSkill()).toBeDefined;
+    expect(team.getTeamGameSkill()).toBeDefined();
     expect(team.getTeamGameSkill()).toEqual(8);
   });
 });

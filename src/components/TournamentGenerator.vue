@@ -115,8 +115,8 @@
     const teams: Array<Team> | GeneratorErrorCode =
       balancedRandomTeamGenerator.generate(players, teamSize.value, game);
     if (typeof teams !== 'number') {
-      for (let i = 0; i < teams.length; i++) {
-        generatedTeams.value.push(teams[i]);
+      for (const element of teams) {
+        generatedTeams.value.push(element);
       }
     } else {
       console.log('Error Code: ' + teams);
@@ -128,7 +128,9 @@
   }
 
   function allParticipantsSelected(): boolean {
-    return selectedParticipants.value.length === filterPlayersByGame.value.length;
+    return (
+      selectedParticipants.value.length === filterPlayersByGame.value.length
+    );
   }
 
   function someParticipantsSelected(): boolean {
@@ -203,12 +205,18 @@
   }
 
   const disableGenerateTeamsBtn = computed(() => {
-    return selectedGameId.value === undefined || selectedParticipants.value.length === 0 || teamSize.value === undefined
+    return (
+      selectedGameId.value === undefined ||
+      selectedParticipants.value.length === 0 ||
+      teamSize.value === undefined
+    );
   });
 
   const filterPlayersByGame = computed(() => {
     return state.players.filter((player) => {
-      const selectedGame = player.gameSkills.find((game) => game.game.id === selectedGameId.value);
+      const selectedGame = player.gameSkills.find(
+        (game) => game.game.id === selectedGameId.value,
+      );
       return selectedGame && selectedGame.skillLevel > 0;
     });
   });

@@ -102,7 +102,10 @@
           <v-col class="players-list" cols="6">
             <template v-for="player in team.fixedPlayers" :key="player.id">
               <div class="d-flex name-container">
-                <p class="player-name truncate" :title="getPlayerTitleAttr(player)">
+                <p
+                  class="player-name truncate"
+                  :title="getPlayerTitleAttr(player)"
+                >
                   {{ player.tag }}
                 </p>
                 <v-icon class="delete-player" @click="removePlayer(player)"
@@ -245,11 +248,11 @@
       state.maxTeamSkill,
     );
     if (typeof addablePlayers !== 'number') {
-      for (let i = 0; i < addablePlayers.length; i++) {
+      for (const element of addablePlayers) {
         if (addSubplayer.value) {
-          team?.addSubstitutionPlayer(addablePlayers[i]);
+          team?.addSubstitutionPlayer(element);
         } else {
-          team?.addPlayer(addablePlayers[i]);
+          team?.addPlayer(element);
         }
       }
     } else {

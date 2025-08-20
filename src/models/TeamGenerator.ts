@@ -2,8 +2,8 @@ import type Game from '@/models/Game';
 import Player from '@/models/Player';
 import Team from '@/models/Team';
 import ContainerUtils from '@/models/ContainerUtils';
-import RandomSource from '@/models/RandomSource';
 import DefaultRandomSource from '@/models/RandomSource';
+import type { RandomSource } from '@/models/RandomSource';
 
 /** This error code is used to determine different invalid input constellations */
 export enum GeneratorErrorCode {
@@ -220,14 +220,14 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
   }
 
   /**
-   * This function takes a list of players, the requested team size and the game for which the players shall be 
+   * This function takes a list of players, the requested team size and the game for which the players shall be
    * teamed up. The result consists of 2 elements:
    * 1) An array of teams which are filled up to the requested team size
    * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
    *    But this extra team was also involved in balancing so it does not containt best or worst players only.
    *
-   * The given player list will first be ordered by their skill in descending order. Balancing is achieved by 
-   * assigning one player after another of the ordered player list to the teams alternating between first and last 
+   * The given player list will first be ordered by their skill in descending order. Balancing is achieved by
+   * assigning one player after another of the ordered player list to the teams alternating between first and last
    * team to start with in each iteration.
    *
    *
@@ -236,7 +236,8 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    * @param game The game on which the teams are created for.
    * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
    */
-  protected assignPlayersToTeamsBalanced(playerArray: Array<Player>,
+  protected assignPlayersToTeamsBalanced(
+    playerArray: Array<Player>,
     teamSize: number,
     game: Game,
   ): [Team[], Team] {
@@ -246,14 +247,14 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     return this.assignPlayersToTeams(orderedPlayerArray, teamSize, game);
   }
 
-    /**
-   * This function takes a list of players, the requested team size and the game for which the players shall be 
+  /**
+   * This function takes a list of players, the requested team size and the game for which the players shall be
    * teamed up. The result consists of 2 elements:
    * 1) An array of teams which are filled up to the requested team size
    * 2) An extra team if player.length % team size != 0. This team contains the remaining players and is not full.
    *    But this extra team was also involved in balancing so it does not containt best or worst players only.
    *
-   * The given player list will first be randomly shuffeled. Then players are added to teams alternating between first 
+   * The given player list will first be randomly shuffeled. Then players are added to teams alternating between first
    * and last team to start with in each iteration.
    *
    *
@@ -262,20 +263,20 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    * @param game The game on which the teams are created for.
    * @returns A tuple containing the created full teams and an additional team holding the remaining players if any
    */
-    protected assignPlayersToTeamsRandom(playerArray: Array<Player>,
-      teamSize: number,
-      game: Game,
-    ): [Team[], Team] {
-      ContainerUtils.shuffleArray(playerArray);
-      return this.assignPlayersToTeams(playerArray, teamSize, game);
-    }
-
+  protected assignPlayersToTeamsRandom(
+    playerArray: Array<Player>,
+    teamSize: number,
+    game: Game,
+  ): [Team[], Team] {
+    ContainerUtils.shuffleArray(playerArray);
+    return this.assignPlayersToTeams(playerArray, teamSize, game);
+  }
 
   /**
-   * This function takes a list of players, team size and game to create teams by adding players to teams alternating between 
+   * This function takes a list of players, team size and game to create teams by adding players to teams alternating between
    * first and last team to start with in each iteration. (This is a precondition for pre-balancing). If the give player list is
    * already ordered by skill then this assignment method will allow for pre-balanced teams as output.
-   * 
+   *
    * @param playerArray The player list to assign to teams.
    * @param teamSize The size of the teams to be created.
    * @param game The game which the teams are created for.
@@ -287,9 +288,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
     game: Game,
   ): [Team[], Team] {
     // Create amount teams that can be fully filled
-    const amountOfFullTeams: number = Math.floor(
-      playerArray.length / teamSize,
-    );
+    const amountOfFullTeams: number = Math.floor(playerArray.length / teamSize);
     const fullTeams: Array<Team> = new Array<Team>();
     for (let i = 1; i <= amountOfFullTeams; i++) {
       fullTeams.push(new Team('Team' + i, teamSize, game));
@@ -369,7 +368,7 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
    * @param teams The teams for which to optimize their balance
    */
   protected optimizeTeamSkillBalance(teams: Array<Team>): void {
-    if (teams.length < 2){
+    if (teams.length < 2) {
       return;
     }
 
@@ -377,20 +376,24 @@ export default class BalancedRandomTeamGenerator implements TeamGenerator {
 
     // optimize team balance as long as successful. Will eventually stop as no swapping improvement possible anymore.
     while (lastSwapSuccessful) {
-
       lastSwapSuccessful = false; // safeguard to terminate while loop.
-      for (let teamA of teams){
-        for (let teamB of teams){
-          if (teamA !== teamB){// try to swap one player between two different teams
+      for (const teamA of teams) {
+        for (const teamB of teams) {
+          if (teamA !== teamB) {
+            // try to swap one player between two different teams
             lastSwapSuccessful = this.trySwapPlayerForBetterBalance(
               teamA,
               teamB,
             );
           }
-          if (lastSwapSuccessful){break;} // break for outer while loop on success. 
+          if (lastSwapSuccessful) {
+            break;
+          } // break for outer while loop on success.
           // if not breaking then possible optimization could be overseen when exiting for loops with last attempt == false.
         }
-        if (lastSwapSuccessful){break;} // break for outer while loop on success.
+        if (lastSwapSuccessful) {
+          break;
+        } // break for outer while loop on success.
       }
     }
   }
