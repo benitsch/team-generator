@@ -5,8 +5,7 @@ import JsonObject from '@/models/JsonObject';
 import GameSkill from '@/models/GameSkill';
 import type Match from '@/models/Match';
 
-export const useMainStore = defineStore({
-  id: 'main',
+export const useMainStore = defineStore('main', {
   state: () => ({
     players: [] as Player[],
     games: [] as Game[],
