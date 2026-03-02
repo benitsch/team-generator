@@ -13,7 +13,7 @@
           :hint="`Total number of Games: ${state.games.length}`"
           persistent-hint
         ></v-select>
-        <v-select
+        <v-autocomplete
           v-model="selectedParticipants"
           class="mb-4"
           :items="filterPlayersByGame"
@@ -21,16 +21,29 @@
           multiple
           item-value="id"
           item-title="tag"
+          :clearable="true"
+          :chips="true"
+          :custom-filter="playerFilter"
           :hint="`Total number of Players: ${selectedParticipants.length}/${filterPlayersByGame.length}`"
           persistent-hint
         >
+          <template #item="{ props, item }">
+            <v-list-item
+              v-bind="props"
+              :subtitle="`${item.raw.firstName} ${item.raw.lastName}`"
+            >
+              <template #prepend>
+                <v-checkbox-btn
+                  :model-value="selectedParticipants.includes(item.raw.id)"
+                  @click.stop="props.onClick"
+                />
+              </template>
+            </v-list-item>
+          </template>
           <template #prepend-item>
             <v-list-item title="Select All" @click="toggleSelectAll">
               <template #prepend>
                 <v-checkbox-btn
-                  :color="
-                    someParticipantsSelected() ? 'indigo-darken-4' : undefined
-                  "
                   :indeterminate="
                     someParticipantsSelected() && !allParticipantsSelected()
                   "
@@ -41,7 +54,7 @@
 
             <v-divider class="mt-2"></v-divider>
           </template>
-        </v-select>
+        </v-autocomplete>
         <v-select
           v-model="teamSize"
           :items="possibleTeamSizeOptions"
@@ -220,6 +233,22 @@
       return selectedGame && selectedGame.skillLevel > 0;
     });
   });
+
+  function playerFilter(
+    value: string,
+    query: string,
+    item?: { raw: Player },
+  ): boolean {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    const player = item?.raw;
+    if (!player) return false;
+    return (
+      player.tag.toLowerCase().includes(q) ||
+      player.firstName.toLowerCase().includes(q) ||
+      player.lastName.toLowerCase().includes(q)
+    );
+  }
 
   watch(selectedGameId, () => {
     selectedParticipants.value.splice(0);
