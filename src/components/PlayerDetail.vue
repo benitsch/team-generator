@@ -5,13 +5,11 @@
         {{ title }}
         <v-spacer></v-spacer>
         <v-btn
-          v-if="isEdit"
-          color="red"
-          variant="outlined"
+          icon="mdi-close"
+          variant="text"
           size="small"
-          icon="mdi-delete"
-          title="Delete Player"
-          @click="$emit('deletePlayer')"
+          title="Close"
+          @click="$emit('cancelDialog')"
         ></v-btn>
       </v-card-title>
       <v-divider></v-divider>
@@ -52,6 +50,16 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions class="justify-end">
+        <v-btn
+          v-if="isEdit"
+          color="red"
+          variant="outlined"
+          size="small"
+          icon="mdi-delete"
+          title="Delete Player"
+          @click="$emit('deletePlayer')"
+        ></v-btn>
+        <v-spacer></v-spacer>
         <v-btn
           elevation="2"
           color="red darken-1"
