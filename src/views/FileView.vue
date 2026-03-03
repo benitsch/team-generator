@@ -75,6 +75,7 @@
     link.click();
     // Remove the link
     document.body.removeChild(link);
+    state.markAsSaved();
   }
 
   /**

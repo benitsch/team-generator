@@ -12,6 +12,7 @@ export const useMainStore = defineStore('main', {
     matches: [] as Match[],
     minTeamSkill: 0 as number,
     maxTeamSkill: 0 as number,
+    savedJson: '' as string,
   }),
   getters: {
     getJson: function (state) {
@@ -21,6 +22,10 @@ export const useMainStore = defineStore('main', {
 
       return JSON.stringify(jsonObj, null, 2);
     },
+    hasUnsavedChanges(): boolean {
+      if (this.savedJson === '') return false;
+      return this.getJson !== this.savedJson;
+    },
   },
   actions: {
     addPlayer(player: Player) {
@@ -28,6 +33,9 @@ export const useMainStore = defineStore('main', {
     },
     addGame(game: Game) {
       this.games.push(game);
+    },
+    markAsSaved() {
+      this.savedJson = this.getJson;
     },
     setStateFromJson(content: string) {
       const data = JSON.parse(content);
@@ -56,8 +64,11 @@ export const useMainStore = defineStore('main', {
         return game;
       });
 
-      this.$state.players = players;
-      this.$state.games = games;
+      this.$patch((state) => {
+        state.players = players;
+        state.games = games;
+      });
+      this.savedJson = this.getJson;
     },
   },
 });
